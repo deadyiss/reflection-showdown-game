@@ -1,209 +1,193 @@
-# ⚔ ReflexShowdown Online
+# 刃影 Reflex Showdown — Game Reaction Berbasis Web
 
-> Game duel refleks real-time berbasis WebSocket. Siapa yang paling cepat klik saat sinyal muncul — dialah pemenangnya. Tapi hati-hati, klik terlalu cepat sebelum sinyal = penalti −1 poin!
+Game duel refleks _real-time_ multiplayer berbasis web. Saat kanji **斬 (tebas)** muncul, pemain menekan tombol target secepat mungkin — yang tercepat memenangkan ronde. Dilengkapi dashboard analisis statistik yang membaca data langsung dari basis data.
 
----
-
-## Cara Main
-
-1. **Register / Login** — buat akun dengan username dan password
-2. **Buat Room** — pilih jumlah ronde (3–10), dapat kode 6 huruf
-3. **Bagikan kode** ke teman, mereka join pakai kode tersebut
-4. **Host klik Mulai Game** saat semua pemain sudah masuk
-5. **Tunggu sinyal `!`** muncul di layar — lalu klik secepat mungkin!
-6. Lihat **statistik & grafik reaction time** setelah semua ronde selesai
-
-### Sistem Poin per Ronde
-| Posisi | Poin |
-|--------|------|
-| 🥇 1st (tercepat) | +3 |
-| 🥈 2nd | +2 |
-| 🥉 3rd | +1 |
-| Lainnya / Timeout | 0 |
-| ⚠ Early Click (klik sebelum sinyal) | −1 |
+**Mata Kuliah:** Cloud Computing
+**Kelompok 2 — Kelas 4D**
+Program Studi Teknik Informatika, Fakultas Teknologi Informasi
+Universitas Islam Kalimantan Muhammad Arsyad Al-Banjari · 2026
 
 ---
 
-## Stack Teknologi
+## Anggota Kelompok
 
-| Layer | Teknologi |
-|-------|-----------|
-| Frontend | HTML5 · CSS3 · Vanilla JS · Canvas API · Chart.js |
-| Backend | PHP 8.1+ · Ratchet WebSocket (cboden/ratchet) · React PHP |
-| Database | MySQL 8.0+ |
-| Deploy Backend | Railway.app |
-| Deploy Frontend | Vercel |
-
----
-
-## Struktur Folder
-
-```
-reflexshowdown-v3/
-├── config.php          ← konfigurasi DB & WebSocket host/port
-├── server.php          ← entry point: php server.php
-├── composer.json       ← dependensi PHP (cboden/ratchet)
-├── Dockerfile          ← untuk deploy Railway
-├── src/
-│   ├── DB.php          ← semua query MySQL (prepared statement)
-│   ├── GameServer.php  ← WebSocket handler & router pesan
-│   └── Room.php        ← state machine game & timer sinyal
-├── public/             ← frontend (static files)
-│   ├── index.html      ← single-page app (5 layar)
-│   ├── css/style.css   ← tema dark samurai
-│   └── js/
-│       ├── config.js       ← URL WebSocket server
-│       ├── game-canvas.js  ← renderer Canvas API
-│       └── app.js          ← WebSocket client & UI logic
-└── database/
-    └── schema.sql      ← CREATE TABLE MySQL
-```
+| Nama | NPM | Peran |
+|------|-----|-------|
+| Dhea Arimbi Almalita | 2410010187 | Backend |
+| Muhammad Tamirul Umam | 2410010444 | Frontend |
+| Norhayati | 2410010025 | Database |
+| Muhammad Firja | 2410010529 | Statistik |
+| Dimas Prayoga | 2410010041 | Statistik |
 
 ---
 
-## Instalasi Lokal
+## Tautan Penting
+
+| Dokumen | Tautan |
+|---------|--------|
+| Video Demo | https://example.com/demo-video _(placeholder — ganti nanti)_ |
+| Proposal (PDF) | https://drive.google.com/file/d/1X_uVMACVk732FzsVR4cM3pBQuXdcz9t9/view?usp=drive_link |
+| Laporan Akhir (PDF) | https://drive.google.com/file/d/1raLDaigeNcH8tLz7o-yCrxOgtcXi5jc3/view?usp=drive_link |
+| Slide Presentasi (PDF) | https://example.com/slides _(placeholder — ganti nanti)_ |
+
+---
+
+## Teknologi yang Digunakan
+
+- **PHP 8.1+** — server WebSocket (Ratchet + event loop ReactPHP) dan halaman statistik.
+- **JavaScript (vanilla)** — sisi klien: koneksi WebSocket, kontrol UI, render arena duel. Tanpa framework.
+- **MySQL** — menyimpan data pemain, sesi, ronde, dan data per klik (sumber analisis statistik).
+- **WebSocket** — komunikasi real-time dua arah antara browser dan server (sinkronisasi sinyal & klik).
+- **HTML & CSS** — antarmuka bertema retro pixel (font Press Start 2P, panel kotak, scanline).
+- **Chart.js** — visualisasi grafik reaction time dan analisis statistik.
+- **SVG pixel-art** — 5 karakter dibuat sebagai grid `<rect>` vektor (tajam pada resolusi berapa pun).
+
+---
+
+## Tangkapan Layar Sistem
+
+### 1. Halaman Login
+![Login](docs/screenshots/01-login.png)
+
+### 2. Lobi (daftar room, buat room, chat)
+![Lobi](docs/screenshots/02-lobby.png)
+
+### 3. Ruang Tunggu & Pemilihan Karakter
+![Ruang Tunggu](docs/screenshots/03-room.png)
+
+### 4. Arena Duel (sinyal 斬 STRIKE)
+![Duel](docs/screenshots/04-duel.png)
+
+### 5. Layar Kemenangan (podium + statistik)
+![Kemenangan](docs/screenshots/05-victory.png)
+
+### 6. Dashboard Analisis Statistik
+![Analitik](docs/screenshots/06-analytics.png)
+
+---
+
+## Cara Menjalankan Sistem
 
 ### Prasyarat
-- PHP 8.1+
-- Composer 2.x
-- MySQL 8.0+
+- Laragon (sudah termasuk PHP, MySQL/MariaDB, Composer), atau PHP 8.1+ dan MySQL terpisah.
 
 ### Langkah
 
-```bash
-# 1. Install dependensi PHP
-composer install
+1. **Install dependency**
+   ```bash
+   cd reflexshowdown
+   composer install
+   ```
 
-# 2. Buat database
-mysql -u root -p < database/schema.sql
+2. **Buat basis data**
+   Lewat HeidiSQL (bawaan Laragon): buat database bernama `reflexshowdown`, lalu **File → Load SQL file** → pilih `database/schema.sql` → jalankan (F9).
 
-# 3. Konfigurasi (opsional — edit langsung atau buat .env)
-#    Edit config.php bagian 'pass' => '' dengan password MySQL kamu
+3. **Periksa konfigurasi** di `config.php` (default Laragon: user `root`, password kosong, database `reflexshowdown`).
 
-# 4. Jalankan WebSocket server (Terminal 1 — biarkan terbuka)
-php server.php
+4. **Jalankan server WebSocket** (biarkan terminal ini terbuka):
+   ```bash
+   php server.php
+   ```
+   Server berjalan di port `8080`.
 
-# 5. Jalankan web server frontend (Terminal 2)
-cd public
-php -S 0.0.0.0:3000
+5. **Jalankan frontend** (terminal kedua):
+   ```bash
+   cd public
+   php -S localhost:3000
+   ```
+   Buka `http://localhost:3000` di browser.
 
-# 6. Buka browser
-# http://localhost:3000
-```
+6. **Main:** Register/Login → buat room → pilih karakter → undang teman (atau tambah bot) → Start Duel.
 
-### Multiplayer LAN
+7. **Lihat analisis:** dari lobi klik tombol **統計 · Analytics**, atau buka `http://localhost:3000/analytics.php`.
 
-```bash
-# Cari IP komputer server (Windows)
-ipconfig
-# Cari: IPv4 Address → misal 192.168.1.105
-
-# Dari HP/laptop lain (WiFi yang sama):
-# http://192.168.1.105:3000
-
-# Pastikan firewall membuka port 8080 dan 3000:
-netsh advfirewall firewall add rule name="RS-WS" dir=in action=allow protocol=TCP localport=8080
-netsh advfirewall firewall add rule name="RS-Web" dir=in action=allow protocol=TCP localport=3000
-```
-
-> **Penting:** Web server harus dijalankan dengan `0.0.0.0`, bukan `localhost`.  
-> Server WebSocket juga sudah dikonfigurasi ke `0.0.0.0` di `config.php`.
+> **Preview tanpa setup:** buka `preview.html` langsung di browser untuk melihat seluruh tampilan & animasi game tanpa menjalankan server atau basis data.
 
 ---
 
-## Deploy Online Gratis (Railway + Vercel)
+## Analisis Statistik
 
-### Backend → Railway
+Halaman `analytics.php` membaca data **langsung dari basis data** (tabel `round_results`, `rounds`, `game_sessions`, `players`) — bukan data simulasi — lalu menghitung metrik dan menguji hipotesis proposal secara otomatis.
 
-1. Push kode ke GitHub
-2. Buka [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Tambah MySQL addon → import `database/schema.sql` via Query tab
-4. Set environment variables:
+### Metrik yang Dihitung
 
-```
-DB_HOST     = [dari MySQL addon Railway]
-DB_PORT     = 3306
-DB_NAME     = [dari MySQL addon Railway]
-DB_USER     = [dari MySQL addon Railway]
-DB_PASS     = [dari MySQL addon Railway]
-WS_PORT     = 8080
-```
+| Metrik | Rumus |
+|--------|-------|
+| Reaction Time (RT) | `click_time − signal_time` (ms) |
+| Rata-rata RT | `SUM(RT) / n` |
+| Konsistensi (Range) | `max(RT) − min(RT)` |
+| Standar Deviasi (SD) | `SQRT( SUM( (RTᵢ − rata)² ) / n )` |
+| Tren Performa | `avg_RT(ronde 4–5) − avg_RT(ronde 1–2)` (negatif = membaik) |
+| Win Rate | `total_wins / total_games × 100%` |
+| Early Click Rate | `total_early / total_rounds × 100%` |
 
-5. Generate Domain di Settings → Networking → catat URL-nya
+### Pertanyaan yang Dijawab (sesuai hipotesis proposal)
 
-### Update config.js
+**H1 — Apakah performa pemain meningkat setelah beberapa kali bermain?**
+Dashboard membandingkan rata-rata RT pada ronde awal (1–2) dengan ronde akhir (4–5) di seluruh sesi. Jika RT akhir lebih rendah, performa meningkat. Prediksi proposal: RT ronde 4–5 lebih rendah 10–20% dari ronde 1–2. Hasilnya ditampilkan dengan grafik tren dan penilaian otomatis **TERBUKTI / TIDAK TERBUKTI**.
 
-Buka `public/js/config.js`, uncomment dan isi URL Railway:
+**H2 — Apakah terdapat pemain yang lebih konsisten dibanding pemain lain?**
+Dashboard menghitung Standar Deviasi RT tiap pemain (makin kecil = makin konsisten) dan korelasi Pearson antara SD dan win rate. Prediksi proposal: korelasi negatif (SD rendah → win rate tinggi). Ditampilkan sebagai scatter plot beserta koefisien korelasi, dengan penilaian otomatis.
 
-```js
-const WS_SERVER_URL = 'wss://NAMA-KAMU.up.railway.app';
-```
+**Apakah hipotesis pada proposal terbukti?**
+Halaman menampilkan kesimpulan akhir berdasarkan data nyata yang terkumpul: status H1 dan H2 (terbukti atau tidak), beserta angka pendukung (persentase peningkatan, koefisien korelasi). Karena penilaian dihitung secara real-time dari isi basis data, kesimpulan akan menyesuaikan seiring bertambahnya data permainan.
 
-### Frontend → Vercel
+### Kesimpulan Didukung Data
+Setiap klaim pada dashboard disertai angka yang dihitung dari tabel basis data: jumlah sesi, jumlah data klik, rata-rata RT per ronde, SD per pemain, dan win rate. Tidak ada nilai yang di-_hardcode_ — halaman kosong sebelum ada permainan dan terisi otomatis setelah beberapa sesi.
 
-1. Push perubahan config.js ke GitHub
-2. Buka [vercel.com](https://vercel.com) → New Project → import repo
-3. **Root Directory: `public`** ← wajib diisi
-4. Deploy → dapat URL `nama.vercel.app`
+> **Catatan:** untuk hasil yang bermakna, kumpulkan data dengan memainkan beberapa sesi (idealnya beberapa pemain manusia, masing-masing beberapa sesi 5 ronde). Dengan sedikit data, hipotesis mungkin tampil "tidak terbukti" hanya karena sampel kecil.
 
 ---
 
-## Arsitektur WebSocket
+## Struktur Proyek
 
 ```
-Browser (app.js)
-    │
-    │  ws:// atau wss://
-    ▼
-server.php (IoServer + HttpServer + WsServer)
-    │
-    ▼
-GameServer.php ── routing pesan JSON ──► register / login
-    │                                    create_room / join_room
-    │                                    start_game
-    │                                    player_click
-    │                                    leave_room
-    ▼
-Room.php ── state machine ──► WAITING
-    │                         ROUND_WAIT  (timer acak 2–6 detik)
-    │                         ROUND_SIGNAL (microtime server)
-    │                         ROUND_RESULT (hitung RT & poin)
-    │                         GAME_OVER   (statistik & simpan DB)
-    ▼
-DB.php ── MySQL ──► players | game_sessions | rounds | round_results
+reflexshowdown/
+├── server.php              # Entry point server WebSocket
+├── config.php              # Konfigurasi DB & host/port
+├── composer.json           # Dependency PHP (Ratchet, dll.)
+├── preview.html            # Preview tampilan tanpa server/database
+├── database/
+│   └── schema.sql          # Skema 4 tabel
+├── src/
+│   ├── GameServer.php      # Handler pesan WebSocket & manajemen room
+│   ├── Room.php            # Logika room: ronde, skor, bot, timer
+│   └── DB.php              # Akses basis data (PDO)
+├── docs/screenshots/       # Tangkapan layar dokumentasi
+└── public/                 # Root web
+    ├── index.html
+    ├── analytics.php       # Dashboard analisis statistik
+    ├── css/{theme,style}.css
+    └── js/{config,sprites,game-canvas,fx,app}.js
 ```
-
-### Anti-cheat
-
-Reaction time dihitung **sepenuhnya di server**:
-
-```
-RT = server_recv_time - server_signal_time
-```
-
-- `server_signal_time` = `microtime(true) * 1000` saat server broadcast sinyal
-- `server_recv_time`   = `microtime(true) * 1000` saat server terima klik pemain
-- Client tidak pernah mengirim timestamp — hanya mengirim event `player_click`
 
 ---
 
-## Fitur
+## Fitur Utama
 
-- ✅ Register & login dengan password (bcrypt)
-- ✅ Room system dengan kode 6 huruf
-- ✅ 2–4 pemain per room
-- ✅ Sinyal acak 2–6 detik (dikontrol server)
-- ✅ Anti-spam: setiap pemain hanya bisa klik 1x per ronde
-- ✅ Early click penalty: klik sebelum sinyal = −1 poin
-- ✅ Canvas renderer bergaya samurai (mudah diganti sprite)
-- ✅ Grafik reaction time per ronde (Chart.js)
-- ✅ Statistik: avg RT, best RT, konsistensi, tren 5 ronde
-- ✅ Multiplayer LAN & online
-- ✅ Auto-reconnect WebSocket
+- Duel multiplayer real-time via WebSocket (server sebagai single source of truth).
+- Target acak tiap ronde (tombol keyboard atau klik mouse) — menuntut refleks asli.
+- 5 karakter pixel-art dengan animasi idle/menang/kalah + reservasi karakter per-room.
+- Sistem bot (mode easy) — host dapat menambah bot; total pemain manusia + bot maksimal 5.
+- Pengukuran reaction time akurat (diukur di sisi klien, bebas latency jaringan).
+- Statistik akhir: podium, peringkat, grafik RT per ronde.
+- Dashboard analisis statistik berbasis data basis data (`analytics.php`).
+- Chat lobi, room ber-PIN, reconnect otomatis.
 
 ---
 
-## Lisensi
+## Aturan Permainan
 
-Terinspirasi dari [ReflexShowdown by LuisBoto](https://github.com/LuisBoto/ReflexShowdown).  
-Dikembangkan untuk keperluan tugas kelompok mata kuliah Pemrograman Web / Jaringan Komputer.
+| Posisi | Poin |
+|--------|------|
+| Tercepat (rank 1) | +3 |
+| Rank 2 | +2 |
+| Rank 3 | +1 |
+| Rank 4+ | 0 |
+| **FLINCH** (klik sebelum sinyal) | **−1** dan ronde langsung berakhir |
+
+Ronde berakhir begitu pemain pertama menekan dengan benar. Pemain yang tidak bereaksi tepat waktu dianggap tidak merespons (0 poin pada ronde itu).
+
+---
+
+_Proyek tugas Mata Kuliah Cloud Computing — Kelompok 2 Kelas 4D, Teknik Informatika, UNISKA, 2026._
