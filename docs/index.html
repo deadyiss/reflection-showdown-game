@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>刃影 Reflex Showdown — PREVIEW (no server)</title>
+<style>
+/* ============================================================
+   theme.css — RETRO PIXEL THEME · 刃影 Blade & Shadow
+   Font pixel (Press Start 2P), palet crimson+gold, gelap.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
+
+:root{
+  --ink-900:#0e0b16; --ink-800:#13101e; --ink-700:#1a1320; --ink-600:#251a2e;
+  --crimson:#d23b40; --crimson-deep:#8f2226; --crimson-dark:#5a1418;
+  --gold:#d8a94b; --gold-soft:#e0b552; --gold-bright:#f0c860;
+  --jade:#5fae84; --purple:#b07ad6; --teal:#5cc6c0; --blue:#6b8bf0;
+  --paper:#e8e2d4; --paper-2:#c8bda9; --paper-3:#8d8474;
+  --hairline:#3a2a3e; --hairline-gold:#d8a94b44;
+  --font-px:'Press Start 2P',monospace;
+  --font-dot:'DotGothic16',monospace;
+  --font-mono:'DotGothic16',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--ink-900);
+  color:var(--paper);
+  font-family:var(--font-dot);
+  font-size:15px;
+  image-rendering:pixelated;
+  overflow:hidden;
+}
+
+/* Scanline overlay global */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.10) 3px,rgba(0,0,0,0) 4px);
+  mix-blend-mode:multiply;
+}
+
+/* ── Panggung dasar ───────────────────────────────────────── */
+.stage{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--ink-900)}
+.grain{background-image:
+  repeating-linear-gradient(0deg,#0e0b16 0px,#0e0b16 7px,#100c1a 7px,#100c1a 8px);}
+
+/* ── Kanji & judul ───────────────────────────────────────── */
+.kanji{font-family:var(--font-dot);font-weight:700}
+.brush-title{font-family:var(--font-px);line-height:1.5;letter-spacing:1px}
+.hero-ink{color:var(--crimson);text-shadow:3px 3px 0 var(--crimson-dark)}
+.label{font-family:var(--font-px);font-size:9px;letter-spacing:1px;color:var(--paper-3);text-transform:uppercase;line-height:1.6}
+.mono{font-family:var(--font-dot)}
+.gold-text{color:var(--gold)}
+
+/* ── Tombol pixel (border kotak, shadow blok) ────────────── */
+.btn{
+  font-family:var(--font-px);font-size:10px;letter-spacing:1px;
+  padding:12px 16px;border:none;cursor:pointer;text-transform:uppercase;
+  color:var(--paper);background:var(--ink-600);
+  box-shadow:0 4px 0 #000, inset 0 0 0 2px var(--hairline);
+  transition:transform .08s var(--ease),box-shadow .08s var(--ease);
+  position:relative;line-height:1.5;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #000, inset 0 0 0 2px var(--gold)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #000, inset 0 0 0 2px var(--hairline)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-primary{background:var(--crimson-deep);box-shadow:0 4px 0 #2a0a0d, inset 0 0 0 2px var(--crimson)}
+.btn-primary:hover{box-shadow:0 6px 0 #2a0a0d, inset 0 0 0 2px var(--gold)}
+.btn-primary:active{box-shadow:0 1px 0 #2a0a0d, inset 0 0 0 2px var(--crimson)}
+.btn-ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--hairline)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 2px var(--gold);transform:translateY(-1px)}
+.btn-block{width:100%}
+
+/* ── Panel pixel ─────────────────────────────────────────── */
+.panel{
+  background:var(--ink-800);
+  box-shadow:inset 0 0 0 2px var(--hairline), 0 4px 0 #000;
+  position:relative;
+}
+.panel.ticks{box-shadow:inset 0 0 0 2px var(--gold-soft), 0 4px 0 #000}
+
+/* ── Input pixel ─────────────────────────────────────────── */
+.input,select.input{
+  width:100%;font-family:var(--font-dot);font-size:15px;
+  padding:10px 12px;color:var(--paper);background:var(--ink-700);
+  border:none;box-shadow:inset 0 0 0 2px var(--hairline);outline:none;
+}
+.input:focus{box-shadow:inset 0 0 0 2px var(--gold)}
+.field{display:block;margin-bottom:12px}
+.field .label{display:block;margin-bottom:5px}
+
+/* ── Rule / pemisah ──────────────────────────────────────── */
+.rule{text-align:center;color:var(--gold);font-size:10px;letter-spacing:2px}
+
+/* ── Dot status ──────────────────────────────────────────── */
+.dot{display:inline-block;width:8px;height:8px}
+.dot-idle{background:var(--gold);animation:blink 1s steps(2) infinite}
+.dot-live{background:var(--jade)}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ── Hinomaru (matahari) ─────────────────────────────────── */
+.hinomaru{background:var(--crimson);border-radius:50%;box-shadow:0 0 0 4px var(--crimson-dark)}
+
+/* ── Animasi sprite ──────────────────────────────────────── */
+.pixel-spr{image-rendering:pixelated;display:block;width:100%;height:100%}
+.spr-holder{width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center}
+.spr-holder.idle{animation:bob 1.6s steps(2,end) infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.spr-holder.idle[style*="scaleX(-1)"]{animation:bobFlip 1.6s steps(2,end) infinite}
+@keyframes bobFlip{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-5px)}}
+.spr-holder.win{animation:winjump .9s ease-in-out infinite}
+@keyframes winjump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-16px) rotate(-5deg)}60%{transform:translateY(-7px) rotate(4deg)}}
+.spr-holder.lose{animation:loseshake .5s steps(3,end) infinite;opacity:.78}
+@keyframes loseshake{0%,100%{transform:translateX(0)}33%{transform:translateX(-3px) rotate(-2deg)}66%{transform:translateX(3px) rotate(2deg)}}
+.win-glow{filter:drop-shadow(0 0 5px var(--gold)) drop-shadow(0 0 10px var(--gold))}
+
+/* ── Animasi umum ────────────────────────────────────────── */
+.anim-fadeup{animation:fadeup .5s var(--ease) both}
+.anim-fadein{animation:fadein .5s var(--ease) both}
+.anim-floaty{animation:floaty 3s ease-in-out infinite}
+.delay-1{animation-delay:.15s}.delay-2{animation-delay:.3s}
+@keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes countPop{0%{transform:scale(2.4);opacity:0}40%{opacity:1}100%{transform:scale(1);opacity:1}}
+
+.scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--hairline) transparent}
+.scroll::-webkit-scrollbar{width:8px}
+.scroll::-webkit-scrollbar-thumb{background:var(--hairline)}
+
+/* Flash crimson saat sinyal */
+.flash-crimson{animation:flashC .35s steps(2) }
+@keyframes flashC{0%,100%{background-color:transparent}50%{background-color:rgba(210,59,64,.18)}}
+
+/* Camera shake (dipakai fx.js) */
+.shake-hard{animation:shHard .4s steps(4)}
+.shake-rumble{animation:shRumble .5s steps(5)}
+.shake-flicker{animation:shFlicker .4s steps(6)}
+.shake-soft{animation:shSoft .35s steps(3)}
+.shake{animation:shSoft .3s steps(3)}
+@keyframes shHard{0%,100%{transform:translate(0,0)}25%{transform:translate(-6px,3px)}50%{transform:translate(6px,-3px)}75%{transform:translate(-4px,2px)}}
+@keyframes shRumble{0%,100%{transform:translate(0,0)}20%{transform:translate(3px,2px)}40%{transform:translate(-3px,-2px)}60%{transform:translate(2px,3px)}80%{transform:translate(-2px,-2px)}}
+@keyframes shFlicker{0%,100%{transform:translate(0,0);opacity:1}50%{transform:translate(2px,-1px);opacity:.85}}
+@keyframes shSoft{0%,100%{transform:translate(0,0)}33%{transform:translate(-2px,1px)}66%{transform:translate(2px,-1px)}}
+
+/* FX particles keyframes (dipakai fx.js) */
+@keyframes fxBurst{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.3) rotate(var(--rot));opacity:0}}
+@keyframes fxDrop{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty) + 30px)) scale(.4);opacity:0}}
+@keyframes fxSlashTint{0%{transform:scaleX(0);opacity:0}40%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes fxShadowSlash{0%{transform:scaleX(0);opacity:0}50%{transform:scaleX(1);opacity:.9}100%{transform:scaleX(1);opacity:0}}
+@keyframes fxRing{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.6);opacity:0}}
+@keyframes fxFlash{0%{opacity:.7}100%{opacity:0}}
+
+/* ============================================================
+   style.css — layout RETRO semua screen (melengkapi theme.css)
+   ============================================================ */
+
+.screen{display:none}
+.screen.active{display:block}
+#screen-loading.active,#screen-room.active,#screen-stats.active{display:grid;place-items:center}
+#screen-login.active,#screen-register.active{display:grid}
+#screen-menu.active{display:flex;flex-direction:column}
+#screen-game.active{display:flex;flex-direction:column}
+
+/* ── Petal (kelopak kotak pixel) ─────────────────────────── */
+.petal-field{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.petal{position:absolute;top:-6%;width:8px;height:8px;background:var(--crimson);opacity:.5;image-rendering:pixelated}
+@keyframes petalFall{0%{transform:translateY(-12px) translateX(0);opacity:0}12%{opacity:.55}85%{opacity:.55}100%{transform:translateY(470px) translateX(38px);opacity:0}}
+
+/* ── Loading ─────────────────────────────────────────────── */
+.loading-center{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;gap:28px}
+.loading-ring-wrap{position:relative;display:grid;place-items:center;width:132px;height:132px}
+.loading-ring{position:absolute;width:120px;height:120px;border:4px solid var(--hairline);border-top-color:var(--gold);animation:spinSlow 1.2s steps(8) infinite}
+.loading-kanji{position:absolute;font-size:42px;color:#fff}
+.loading-bar{height:14px;background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);overflow:hidden}
+.loading-fill{height:100%;width:0%;background:var(--crimson);box-shadow:inset 0 -4px 0 var(--crimson-dark);transition:width .12s steps(4)}
+.loading-status{display:flex;justify-content:space-between;margin-top:10px;font-family:var(--font-px);font-size:8px;color:var(--paper-3)}
+
+/* ── Auth ────────────────────────────────────────────────── */
+.auth-shell{grid-template-columns:1fr 1fr}
+.auth-brand{position:relative;overflow:hidden;display:grid;place-items:center;box-shadow:inset -2px 0 0 var(--hairline)}
+.auth-brand-glow{position:absolute;inset:0;background:radial-gradient(60% 50% at 35% 35%,rgba(210,59,64,.14),transparent 60%)}
+.auth-hero{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:240px;height:280px;z-index:2}
+.auth-hero .spr-holder{animation:floaty 3s ease-in-out infinite}
+.auth-brand-logo{position:absolute;top:34px;left:34px;z-index:3}
+.auth-brand-kanji{position:absolute;right:20px;bottom:14px;font-size:130px;color:rgba(216,169,75,.07)}
+.auth-form-panel{display:grid;place-items:center;padding:0 8%}
+.auth-title{font-size:18px;margin:12px 0 22px;color:var(--paper);line-height:1.6}
+.ws-status{margin-top:18px;text-align:center;font-family:var(--font-px);font-size:8px;color:var(--paper-3);display:flex;align-items:center;justify-content:center;gap:7px}
+
+/* ── Lobi ────────────────────────────────────────────────── */
+.lobby-shell{padding:0}
+.lobby-header{display:flex;align-items:center;gap:14px;padding:14px 22px;box-shadow:inset 0 -2px 0 var(--hairline);background:var(--ink-800);z-index:3}
+.lobby-brand{display:flex;align-items:center;gap:10px}
+.lobby-brand .kanji{font-size:22px;color:var(--gold)}
+.lobby-user{flex:1;color:var(--gold-soft);font-family:var(--font-px);font-size:9px}
+.lobby-grid{flex:1;display:grid;grid-template-columns:300px 1fr 300px;gap:14px;padding:14px;min-height:0}
+.lobby-col{display:flex;flex-direction:column;overflow:hidden}
+.lobby-col-head{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;box-shadow:inset 0 -2px 0 var(--hairline)}
+.badge-count{background:var(--crimson);color:#fff;font-family:var(--font-px);font-size:9px;padding:3px 7px}
+
+.lobby-room-list{flex:1;padding:10px;display:flex;flex-direction:column;gap:9px}
+.room-card{background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);padding:12px 14px;cursor:pointer;transition:transform .08s var(--ease),box-shadow .12s}
+.room-card:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 2px var(--gold),0 4px 0 #000}
+.room-card.playing{opacity:.5;cursor:not-allowed}
+.room-card.playing:hover{transform:none;box-shadow:inset 0 0 0 2px var(--hairline)}
+.room-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.room-card-code{font-family:var(--font-px);font-size:12px;color:var(--gold)}
+.room-card-status{font-family:var(--font-px);font-size:7px;padding:3px 6px;letter-spacing:1px}
+.status-waiting{background:rgba(95,174,132,.18);color:var(--jade);box-shadow:inset 0 0 0 1px var(--jade)}
+.status-playing{background:rgba(210,59,64,.18);color:var(--crimson);box-shadow:inset 0 0 0 1px var(--crimson)}
+.room-card-info{display:flex;gap:12px;font-family:var(--font-px);font-size:8px;color:var(--paper-3)}
+.empty-state{text-align:center;color:var(--paper-3);font-family:var(--font-px);font-size:9px;padding:30px 10px;line-height:2}
+
+.lobby-create{flex:1;padding:14px;display:flex;flex-direction:column;gap:12px}
+.lobby-chat{flex:1;padding:12px;display:flex;flex-direction:column;gap:7px}
+.chat-msg{background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);padding:8px 11px;font-size:14px;line-height:1.5}
+.chat-msg.mine{box-shadow:inset 0 0 0 2px var(--gold)}
+.chat-msg .chat-user{font-family:var(--font-px);font-size:8px;color:var(--gold);margin-bottom:4px}
+.chat-msg .chat-time{float:right;color:var(--paper-3);font-size:12px}
+.lobby-chat-input{display:flex;gap:8px;padding:10px;box-shadow:inset 0 2px 0 var(--hairline)}
+.lobby-chat-input .input{flex:1}
+
+/* ── Room ────────────────────────────────────────────────── */
+.room-wrap{width:100%;max-width:920px;padding:20px}
+.room-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.room-code-line{font-family:var(--font-px);font-size:14px;margin-top:8px}
+.room-body{display:grid;grid-template-columns:1.3fr .7fr;gap:16px}
+.char-select{display:flex;flex-direction:column}
+.char-roster{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.char-chip{width:66px;height:66px;background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);cursor:pointer;transition:transform .08s;position:relative;padding:6px}
+.char-chip:hover{transform:translateY(-2px)}
+.char-chip.active{box-shadow:inset 0 0 0 3px var(--gold)}
+.char-chip.taken{opacity:.4;cursor:not-allowed;position:relative}
+.char-chip.taken:hover{transform:none}
+.char-taken-tag{position:absolute;bottom:0;left:0;right:0;background:var(--crimson-deep);color:#fff;font-family:var(--font-px);font-size:6px;padding:2px 0;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.char-chip .pixel-spr{width:100%;height:100%}
+.char-preview{flex:1;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:16px;position:relative;overflow:hidden}
+.char-preview .preview-spr{width:150px;height:170px}
+.char-preview .preview-spr .spr-holder{animation:bob 1.6s steps(2) infinite}
+.char-preview-name{position:absolute;top:16px;left:16px}
+.char-preview-name .brush-title{font-size:13px}
+
+.room-players{display:flex;flex-direction:column}
+.player-list{list-style:none;padding:10px;flex:1;display:flex;flex-direction:column;gap:6px}
+.player-list li{padding:10px 12px;background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);display:flex;align-items:center;gap:9px;font-size:14px}
+.player-badge{font-family:var(--font-px);font-size:7px;background:var(--crimson);color:#fff;padding:3px 6px;margin-left:auto}
+.room-meta{padding:11px 14px;box-shadow:inset 0 2px 0 var(--hairline)}
+.hint{font-family:var(--font-px);font-size:8px;color:var(--paper-3);margin-top:8px;text-align:center;line-height:1.8}
+#guest-waiting{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+#guest-waiting .hint{margin:0}
+#host-controls{padding:0 12px 12px}
+
+/* ── Duel arena ──────────────────────────────────────────── */
+.duel-stage{user-select:none}
+.duel-hud{display:flex;justify-content:space-between;align-items:center;padding:11px 18px;box-shadow:inset 0 -2px 0 var(--hairline);z-index:6;background:var(--ink-800)}
+.duel-rounds{display:flex;align-items:center;gap:7px}
+.duel-pip{width:10px;height:10px;background:var(--ink-600);box-shadow:inset 0 0 0 1px var(--hairline)}
+.duel-pip.done{background:var(--gold)}
+.duel-pip.current{background:var(--crimson);animation:blink .6s steps(2) infinite}
+
+.duel-arena{flex:1;display:flex;min-height:0;position:relative}
+.duel-lane{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset -1px 0 0 var(--hairline);transition:filter .2s;padding:12px 0}
+.duel-lane:last-child{box-shadow:none}
+.duel-lane.dim{filter:brightness(.45) saturate(.6)}
+.duel-lane-pips{display:flex;gap:4px;height:18px;justify-content:center;flex-wrap:wrap;max-width:90%}
+.duel-lane-pip{width:7px;height:7px;background:var(--ink-600);box-shadow:inset 0 0 0 1px var(--hairline)}
+.duel-lane-pip.on{background:var(--gold)}
+.duel-sprite{flex:1;width:100%;position:relative;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 8%}
+.duel-sprite .spr-holder{width:auto;height:60%;max-height:180px;min-height:90px;aspect-ratio:14/16;display:flex;align-items:flex-end;justify-content:center}
+.duel-sprite .spr-holder .pixel-spr{height:100%;width:auto}
+.duel-platform{width:64px;height:8px;background:var(--crimson-dark);box-shadow:0 4px 0 #2a0a0d;margin-top:6px}
+.duel-badge{position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:3;padding:4px 8px;font-family:var(--font-px);font-size:8px;white-space:nowrap;background:var(--ink-900);color:var(--paper-2);box-shadow:inset 0 0 0 2px var(--hairline)}
+.duel-badge.win{background:var(--gold);color:#1a1206;box-shadow:0 3px 0 #8a6a18;font-size:11px;padding:6px 12px;animation:badgePop .4s steps(4) both}
+.duel-badge.flinch{color:#fff;background:var(--crimson-deep);box-shadow:0 3px 0 #2a0a0d;animation:badgePop .4s steps(4) both}
+@keyframes badgePop{0%{transform:translateX(-50%) translateY(8px) scale(.4);opacity:0}100%{transform:translateX(-50%) translateY(0) scale(1);opacity:1}}
+.duel-name{padding:6px 4px 12px;text-align:center;width:100%}
+.duel-name .nm{font-family:var(--font-px);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.duel-name .nm.me{color:var(--gold-soft)}
+.duel-name .el{font-family:var(--font-px);font-size:7px;margin-top:4px}
+
+.duel-center{position:absolute;top:0;left:0;right:0;bottom:0;display:grid;place-items:center;pointer-events:none;z-index:5}
+.duel-tap-zone{position:absolute;inset:0;background:transparent;border:none;cursor:pointer;z-index:4}
+.duel-tap-zone:disabled{cursor:default}
+.px-prompt{text-align:center;background:var(--ink-900);padding:18px 36px;box-shadow:inset 0 0 0 3px var(--hairline)}
+.px-prompt.signal{box-shadow:inset 0 0 0 3px var(--crimson)}
+.kanji-pixel{font-family:var(--font-dot);font-weight:700;font-size:72px;color:var(--paper-3);line-height:1}
+.kanji-pixel.slash{color:#fff;animation:countPop .2s steps(3)}
+.px-count{font-family:var(--font-px);font-size:90px;color:#fff;animation:countPop .7s steps(6) forwards}
+.px-label{font-family:var(--font-px);font-size:14px;color:var(--paper-3);margin-top:10px}
+.px-signal{font-family:var(--font-px);font-size:26px;color:var(--crimson);margin-top:10px;text-shadow:2px 2px 0 var(--crimson-dark)}
+.px-target{font-family:var(--font-px);font-size:13px;color:var(--gold);margin-top:12px}
+
+.duel-reveal{display:flex;align-items:center;justify-content:center;gap:18px;padding:13px 18px;box-shadow:inset 0 2px 0 var(--hairline);background:var(--ink-800);z-index:9;font-family:var(--font-px);font-size:10px;color:var(--paper-2)}
+
+/* ── Stats ───────────────────────────────────────────────── */
+/* ── VICTORY SCREEN (full layout, tanpa scroll) ────────────── */
+#screen-stats.active{display:flex;align-items:stretch;justify-content:center}
+.victory-screen{width:100%;max-width:1100px;height:100vh;padding:18px 22px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2}
+.victory-header{display:flex;align-items:center;gap:18px;justify-content:center;flex-shrink:0}
+.victory-kanji{font-size:60px;line-height:1;text-shadow:3px 3px 0 #000}
+.victory-name{font-family:var(--font-px);font-size:18px;margin-top:6px}
+#victory-sub{color:var(--gold-soft)}
+
+/* Podium */
+.victory-podium{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:18px;min-height:0;padding:8px 0}
+.podium-slot{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;animation:fadeup .5s var(--ease) both}
+.podium-medal{font-size:22px;margin-bottom:4px}
+.podium-spr{flex:1;display:flex;align-items:flex-end;justify-content:center;min-height:0;width:110px}
+.podium-slot.champ .podium-spr{width:160px}
+.podium-spr .spr-holder{height:auto;max-height:100%;aspect-ratio:14/16;display:flex;align-items:flex-end}
+.podium-spr .pixel-spr{height:100%;width:auto;image-rendering:pixelated}
+.podium-slot:not(.champ) .podium-spr{max-height:62%}
+.podium-base{margin-top:8px;text-align:center;padding:8px 14px;background:var(--ink-800);box-shadow:inset 0 0 0 2px var(--c, var(--hairline)),0 4px 0 #000;min-width:96px}
+.podium-slot.champ .podium-base{box-shadow:inset 0 0 0 3px var(--gold),0 6px 0 #000;padding:10px 18px}
+.podium-name{font-family:var(--font-px);font-size:8px;color:var(--paper-2);white-space:nowrap}
+.podium-name.me{color:var(--gold-soft)}
+.podium-pts{font-family:var(--font-px);font-size:16px;color:var(--gold);margin-top:6px}
+.podium-pts span{font-size:8px;color:var(--paper-3)}
+
+/* Bawah: ranks + chart berdampingan */
+.victory-bottom{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;height:32vh;flex-shrink:0}
+.victory-ranks{display:flex;flex-direction:column;overflow:hidden}
+.victory-ranks .scroll{flex:1;padding:8px;display:flex;flex-direction:column;gap:7px}
+.rank-row{display:flex;align-items:center;gap:10px;background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);padding:7px 10px}
+.rank-row.first{box-shadow:inset 0 0 0 2px var(--gold)}
+.rank-row.me{background:rgba(216,169,75,.08)}
+.rank-num{font-family:var(--font-px);font-size:13px;color:var(--paper-3);width:22px;text-align:center}
+.rank-row.first .rank-num{color:var(--gold)}
+.rank-spr{width:34px;height:38px;flex-shrink:0}
+.rank-spr .pixel-spr{width:100%;height:100%}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-family:var(--font-px);font-size:9px;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-stats{display:flex;gap:12px;font-size:12px;color:var(--paper-3)}
+.rank-stats b{font-family:var(--font-px);font-size:10px;color:var(--paper)}
+.victory-chart{padding:12px;display:flex;flex-direction:column;overflow:hidden}
+.chart-box{flex:1;min-height:0;position:relative}
+.chart-box canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.victory-actions{display:flex;gap:12px;justify-content:center;flex-shrink:0}
+.victory-actions .btn{min-width:180px}
+
+@media (max-width:760px){
+  .victory-bottom{grid-template-columns:1fr;height:auto}
+  .victory-screen{height:auto;min-height:100vh}
+}
+
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--crimson-deep);color:#fff;padding:12px 20px;font-family:var(--font-px);font-size:9px;box-shadow:inset 0 0 0 2px var(--gold),0 4px 0 #000;opacity:0;pointer-events:none;transition:opacity .2s;z-index:9998;line-height:1.6}
+#toast.show{opacity:1}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(5,3,8,.82);display:flex;align-items:center;justify-content:center;z-index:100}
+.modal-box{width:100%;max-width:340px;padding:28px 30px}
+
+@media (max-width:900px){
+  .lobby-grid{grid-template-columns:1fr;overflow-y:auto}
+  .lobby-col{max-height:300px}
+  .auth-shell{grid-template-columns:1fr}.auth-brand{display:none}
+  .room-body{grid-template-columns:1fr}
+}
+
+#preview-bar{position:fixed;top:0;left:0;right:0;z-index:10000;background:#1a1320;box-shadow:inset 0 -2px 0 var(--gold);padding:8px 14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-family:var(--font-px);font-size:8px}
+#preview-bar .pv-title{color:var(--gold);margin-right:8px}
+#preview-bar button{font-family:var(--font-px);font-size:8px;padding:6px 9px;cursor:pointer;background:var(--ink-600);color:var(--paper);border:none;box-shadow:inset 0 0 0 2px var(--hairline)}
+#preview-bar button:hover{box-shadow:inset 0 0 0 2px var(--gold)}
+#preview-bar button.active{background:var(--crimson-deep);box-shadow:inset 0 0 0 2px var(--crimson)}
+#preview-bar .pv-note{color:var(--paper-3);margin-left:auto}
+.screen{top:38px!important}
+.stage{height:calc(100vh - 38px)!important;margin-top:38px}
+</style></head><body>
+<div id="preview-bar">
+  <span class="pv-title">刃影 PREVIEW</span>
+  <button data-s="loading">Loading</button>
+  <button data-s="login">Login</button>
+  <button data-s="register">Register</button>
+  <button data-s="menu">Lobby</button>
+  <button data-s="room">Waiting Room</button>
+  <button data-s="game">Duel</button>
+  <button data-s="stats">Victory</button>
+  <button id="pv-auto">▶ Auto Tour</button>
+  <span class="pv-note">Preview mode — no server/database. Real visuals & animations.</span>
+</div>
+
+
+<!-- ═══ SCREEN: LOADING ═══════════════════════════════════════════════ -->
+<div id="screen-loading" class="screen stage grain active">
+  <div class="petal-field" id="loading-petals"></div>
+  <div class="loading-center">
+    <div class="loading-ring-wrap">
+      <div class="loading-ring"></div>
+      <div class="hinomaru anim-floaty" style="width:92px;height:92px"></div>
+      <div class="kanji loading-kanji">刃</div>
+    </div>
+    <div>
+      <div class="brush-title hero-ink anim-fadeup" style="font-size:52px">刃影</div>
+      <div class="label anim-fadeup delay-1" style="margin-top:6px">BLADE & SHADOW · REFLEX DUEL</div>
+    </div>
+    <div class="anim-fadeup delay-2" style="width:320px;max-width:70vw">
+      <div class="loading-bar"><div class="loading-fill" id="loading-fill"></div></div>
+      <div class="mono loading-status">
+        <span id="loading-step">forging the blade</span>
+        <span class="gold-text" id="loading-pct">0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: AUTH (Login + Register) ═══════════════════════════════ -->
+<div id="screen-login" class="screen stage grain auth-shell">
+  <div class="auth-brand">
+    <div class="auth-brand-glow"></div>
+    <div class="petal-field" id="login-petals"></div>
+    <div class="auth-hero" id="login-hero"></div>
+    <div class="auth-brand-logo">
+      <div class="brush-title hero-ink" style="font-size:40px">刃影</div>
+      <div class="label" style="margin-top:4px">BLADE & SHADOW</div>
+    </div>
+    <div class="kanji auth-brand-kanji">居合</div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="anim-fadeup" style="width:100%;max-width:340px">
+      <div class="label" style="color:var(--gold-soft)">入場 · ENTER THE DOJO</div>
+      <h1 class="brush-title auth-title">Welcome, warrior</h1>
+      <label class="field" style="margin-bottom:14px">
+        <span class="label">Username / 名</span>
+        <input class="input" id="inp-login-user" type="text" placeholder="ksatria_senja" maxlength="20" autocomplete="username">
+      </label>
+      <label class="field" style="margin-bottom:18px">
+        <span class="label">Password / 鍵</span>
+        <input class="input" id="inp-login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </label>
+      <button class="btn btn-primary btn-block" id="btn-login">抜刀 · Enter Arena</button>
+      <div class="rule" style="margin:20px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.2em">◆</div>
+      <button class="btn btn-ghost btn-block" id="btn-goto-register">新規 · Create new account</button>
+      <div id="ws-status" class="ws-status"><span class="dot dot-idle"></span> Connecting...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: REGISTER ══════════════════════════════════════════════ -->
+<div id="screen-register" class="screen stage grain auth-shell">
+  <div class="auth-brand">
+    <div class="auth-brand-glow"></div>
+    <div class="petal-field" id="reg-petals"></div>
+    <div class="auth-hero" id="reg-hero"></div>
+    <div class="auth-brand-logo">
+      <div class="brush-title hero-ink" style="font-size:40px">刃影</div>
+      <div class="label" style="margin-top:4px">BLADE & SHADOW</div>
+    </div>
+    <div class="kanji auth-brand-kanji">挑戦</div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="anim-fadeup" style="width:100%;max-width:340px">
+      <div class="label" style="color:var(--gold-soft)">新規 · NEW CHALLENGER</div>
+      <h1 class="brush-title auth-title">Forge your name</h1>
+      <label class="field" style="margin-bottom:14px">
+        <span class="label">Username / 名</span>
+        <input class="input" id="inp-reg-user" type="text" placeholder="ksatria_senja" maxlength="20">
+      </label>
+      <label class="field" style="margin-bottom:14px">
+        <span class="label">Password / 鍵</span>
+        <input class="input" id="inp-reg-pass" type="password" placeholder="min. 6 characters">
+      </label>
+      <label class="field" style="margin-bottom:18px">
+        <span class="label">Confirm Password / 確</span>
+        <input class="input" id="inp-reg-pass2" type="password" placeholder="••••••••">
+      </label>
+      <button class="btn btn-primary btn-block" id="btn-register">結 · Forge your oath</button>
+      <div class="rule" style="margin:20px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.2em">◆</div>
+      <button class="btn btn-ghost btn-block" id="btn-goto-login">← Back to gate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: LOBI (Room list | Create | Chat) ══════════════════════ -->
+<div id="screen-menu" class="screen stage grain lobby-shell">
+  <div class="lobby-header">
+    <div class="lobby-brand"><span class="kanji">刃影</span> <span class="label">DOJO</span></div>
+    <div class="lobby-user mono" id="menu-username-label"></div>
+    
+    <button class="btn btn-ghost" style="padding:7px 14px;font-size:10px" id="btn-logout">退 · Logout</button>
+  </div>
+  <div class="lobby-grid">
+    <!-- LEFT: Room List -->
+    <div class="lobby-col panel ticks">
+      <div class="lobby-col-head">
+        <span class="label">大広間 · ROOM LIST</span>
+        <span class="badge-count" id="room-count-badge">0</span>
+      </div>
+      <div class="scroll lobby-room-list" id="room-list-container">
+        <p class="empty-state">No rooms yet. Create the first one!</p>
+      </div>
+    </div>
+    <!-- CENTER: Create Room -->
+    <div class="lobby-col panel ticks">
+      <div class="lobby-col-head"><span class="label">作成 · CREATE ROOM</span></div>
+      <div class="lobby-create scroll">
+        <label class="field"><span class="label">Rounds</span>
+          <select class="input" id="sel-rounds">
+            <option value="3">3 Rounds</option>
+            <option value="5" selected>5 Rounds</option>
+            <option value="7">7 Rounds</option>
+            <option value="10">10 Rounds</option>
+          </select>
+        </label>
+        <label class="field"><span class="label">Max Players</span>
+          <select class="input" id="sel-max-players">
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4" selected>4 Players</option>
+            <option value="5">5 Players</option>
+          </select>
+        </label>
+        <label class="field"><span class="label">PIN (optional · 4–6 digits)</span>
+          <input class="input" id="inp-create-pin" type="text" placeholder="leave empty for no PIN" maxlength="6" inputmode="numeric">
+        </label>
+        <button class="btn btn-primary btn-block" id="btn-create-room" style="margin-top:4px">＋ Open Room</button>
+        <div class="rule" style="margin:16px 0">◆</div>
+        <div class="label" style="margin-bottom:10px">鍵 · JOIN BY CODE</div>
+        <label class="field"><input class="input" id="inp-room-code" type="text" placeholder="CODE (6 letters)" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-weight:700"></label>
+        <button class="btn btn-ghost btn-block" id="btn-join-code" style="margin-top:8px">Join</button>
+      </div>
+    </div>
+    <!-- KANAN: Chat Global -->
+    <div class="lobby-col panel ticks">
+      <div class="lobby-col-head"><span class="label">伝言 · CHAT</span></div>
+      <div class="scroll lobby-chat" id="chat-messages"></div>
+      <div class="lobby-chat-input">
+        <input class="input" id="inp-chat" type="text" placeholder="Type a message..." maxlength="100">
+        <button class="btn btn-primary" id="btn-chat-send" style="padding:10px 14px">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: PIN ════════════════════════════════════════════════════ -->
+<div id="modal-pin" class="modal-overlay" style="display:none">
+  <div class="panel ticks modal-box">
+    <div class="kanji" style="font-size:42px;color:var(--gold);text-align:center">鍵</div>
+    <p class="brush-title" style="text-align:center;font-size:20px;margin:6px 0 16px">Room Locked</p>
+    <label class="field" style="margin-bottom:16px">
+      <span class="label">Enter PIN</span>
+      <input class="input" id="inp-pin-modal" type="text" placeholder="••••" maxlength="6" inputmode="numeric" style="text-align:center;letter-spacing:8px;font-size:22px">
+    </label>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost btn-block" id="btn-pin-cancel">Cancel</button>
+      <button class="btn btn-primary btn-block" id="btn-pin-confirm">Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: ROOM (Ruang Tunggu + pilih karakter) ══════════════════ -->
+<div id="screen-room" class="screen stage grain">
+  <div class="room-wrap">
+    <div class="room-header">
+      <div>
+        <div class="label">居合 · WAITING ROOM</div>
+        <div class="room-code-line">CODE: <span class="gold-text" id="room-code-display">------</span>
+          <button class="btn btn-ghost" id="btn-copy-code" style="padding:4px 10px;font-size:10px;margin-left:8px">Copy</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost" id="btn-leave-room" style="padding:8px 16px">← Leave</button>
+    </div>
+
+    <div class="room-body">
+      <!-- Character selection -->
+      <div class="char-select">
+        <div class="label" style="margin-bottom:10px">選 · CHOOSE WARRIOR</div>
+        <div class="char-roster" id="char-roster"></div>
+        <div class="char-preview panel" id="char-preview"></div>
+      </div>
+
+      <!-- Player list in room -->
+      <div class="room-players panel ticks">
+        <div class="lobby-col-head"><span class="label">武者 · PLAYERS (<span id="room-count">0</span>/<span id="room-max">4</span>)</span></div>
+        <ul class="player-list scroll" id="room-player-list"></ul>
+        <div class="room-meta label" id="rounds-label">ROUNDS: 5</div>
+        <div id="host-controls">
+          <div id="bot-controls" style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-ghost btn-block" id="btn-add-bot" style="font-size:8px">+ ADD BOT</button>
+            <button class="btn btn-ghost btn-block" id="btn-remove-bot" style="font-size:8px" disabled>− REMOVE BOT</button>
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-start-game" disabled style="margin-top:10px">⚔ START DUEL</button>
+          <p class="hint">Minimum 2 players (human/bot) · max 5</p>
+        </div>
+        <div id="guest-waiting" style="display:none">
+          <p class="hint" style="text-align:center;margin-top:14px">⏳ Waiting for host to start...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: GAME (Duel Arena) ═════════════════════════════════════ -->
+<div id="screen-game" class="screen stage grain duel-stage">
+  <header class="duel-hud">
+    <span class="mono" id="game-room-label" style="color:var(--paper-3)">ROOM: ------</span>
+    <div class="duel-rounds" id="duel-round-pips"></div>
+    <span class="label" id="game-round-label">ROUND 0/5</span>
+  </header>
+  <div class="duel-arena" id="duel-arena"></div>
+  <div class="duel-center" id="duel-center"></div>
+  <button id="btn-click" class="duel-tap-zone" disabled></button>
+  <div class="duel-reveal" id="duel-reveal" style="display:none"></div>
+</div>
+
+<!-- ═══ SCREEN: STATS ═════════════════════════════════════════════════ -->
+<div id="screen-stats" class="screen stage grain">
+  <div class="petal-field" id="stats-petals"></div>
+  <div class="victory-screen">
+
+    <!-- Header kemenangan -->
+    <div class="victory-header">
+      <div class="kanji victory-kanji" id="winner-kanji">勝</div>
+      <div>
+        <div class="label" id="victory-sub">THE CHAMPION</div>
+        <h2 class="brush-title victory-name">🏆 <span id="winner-name">---</span></h2>
+      </div>
+    </div>
+
+    <!-- Podium karakter -->
+    <div class="victory-podium" id="victory-podium"></div>
+
+    <!-- Bawah: rincian + grafik berdampingan -->
+    <div class="victory-bottom">
+      <div class="victory-ranks panel ticks">
+        <div class="lobby-col-head"><span class="label">順位 · PERINGKAT</span></div>
+        <div class="scroll" id="all-player-stats"></div>
+      </div>
+      <div class="victory-chart panel">
+        <div class="label" style="margin-bottom:8px">推移 · REACTION TIME PER ROUND</div>
+        <div class="chart-box"><canvas id="rt-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tombol -->
+    <div class="victory-actions">
+      <button class="btn btn-ghost" id="btn-play-again">↻ Play Again</button>
+      <button class="btn btn-primary" id="btn-back-menu">← Back to Lobby</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+
+
+
+
+
+
+
+<script>/* ============================================================
+   sprites.js — 5 karakter pixel-art (SVG rect grid)
+   Tiap sprite: viewBox 0 0 14 16, shape-rendering crispEdges.
+   Dipanggil DuelRenderer.spriteSVG(charId, state).
+   Tajam di resolusi apapun (vektor), tetap gaya pixel retro.
+   ============================================================ */
+const SPRITES = (() => {
+
+  // Helper: bungkus body pixel jadi <svg> utuh
+  function wrap(inner) {
+    // Auto-center: hitung min/max X dari semua <rect>, geser konten agar
+    // pusat massa horizontalnya tepat di tengah viewBox (x=7 dari 14).
+    let minX = 99, maxX = -99;
+    const re = /x="(\d+(?:\.\d+)?)"[^>]*width="(\d+(?:\.\d+)?)"/g;
+    let m;
+    while ((m = re.exec(inner)) !== null) {
+      const x = parseFloat(m[1]), w = parseFloat(m[2]);
+      if (x < minX) minX = x;
+      if (x + w > maxX) maxX = x + w;
+    }
+    let shift = 0;
+    if (maxX > minX) {
+      const contentCenter = (minX + maxX) / 2;
+      shift = Math.round((7 - contentCenter) * 10) / 10;  // center ke x=7
+    }
+    return `<svg class="pixel-spr" viewBox="0 0 14 16" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><g transform="translate(${shift},0)">${inner}</g></svg>`;
+  }
+  function r(x,y,w,h,c){ return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`; }
+
+  /* ── REAPER / Mira — Darah (crimson) ───────────────────── */
+  const reaper = {
+    idle: wrap(
+      r(3,0,6,1,'#1a1014')+r(2,1,8,1,'#1a1014')+
+      r(2,2,2,1,'#1a1014')+r(4,2,4,1,'#8f2226')+r(8,2,2,1,'#1a1014')+
+      r(2,3,1,1,'#1a1014')+r(3,3,6,1,'#a83036')+r(9,3,1,1,'#1a1014')+
+      r(3,4,1,1,'#1a1014')+r(4,4,4,1,'#e8d9c0')+r(8,4,1,1,'#1a1014')+
+      r(4,5,1,1,'#3a0e11')+r(5,5,2,1,'#e8d9c0')+r(7,5,1,1,'#3a0e11')+
+      r(4,6,4,1,'#e8d9c0')+
+      r(3,7,6,1,'#7a1a1f')+r(2,8,8,1,'#8f2226')+
+      r(2,9,1,1,'#7a1a1f')+r(3,9,6,1,'#8f2226')+r(9,9,1,1,'#7a1a1f')+
+      r(3,10,6,1,'#3a0e11')+r(3,11,6,1,'#3a0e11')+
+      r(3,12,2,1,'#4a1115')+r(7,12,2,1,'#4a1115')+
+      r(3,13,2,1,'#2a0a0d')+r(7,13,2,1,'#2a0a0d')+
+      r(10,1,1,13,'#6b5436')+r(9,0,3,1,'#c8bda9')+r(11,1,2,1,'#c8bda9')+r(12,2,1,2,'#c8bda9')
+    ),
+    win: wrap(
+      r(3,1,6,1,'#1a1014')+r(2,2,8,1,'#1a1014')+
+      r(2,3,2,1,'#1a1014')+r(4,3,4,1,'#b0282e')+r(8,3,2,1,'#1a1014')+
+      r(2,4,1,1,'#1a1014')+r(3,4,6,1,'#c4383f')+r(9,4,1,1,'#1a1014')+
+      r(3,5,1,1,'#1a1014')+r(4,5,4,1,'#f0e2c8')+r(8,5,1,1,'#1a1014')+
+      r(4,6,1,1,'#3a0e11')+r(5,6,2,1,'#f0e2c8')+r(7,6,1,1,'#3a0e11')+
+      r(4,7,4,1,'#f0e2c8')+
+      r(3,8,6,1,'#8f2226')+r(2,9,8,1,'#b0282e')+r(2,10,8,1,'#b0282e')+
+      r(3,11,6,1,'#4a1115')+
+      r(3,12,2,1,'#5a1418')+r(7,12,2,1,'#5a1418')+
+      r(3,13,2,1,'#3a0e11')+r(7,13,2,1,'#3a0e11')+
+      r(1,0,1,9,'#6b5436')+r(0,0,3,1,'#f0c860')+r(0,1,1,2,'#f0c860')+r(2,1,1,2,'#f0c860')+r(1,2,1,1,'#f0c860')
+    ),
+    lose: wrap(
+      r(3,3,6,1,'#1a1014')+r(2,4,8,1,'#1a1014')+
+      r(2,5,2,1,'#1a1014')+r(4,5,4,1,'#5a1418')+r(8,5,2,1,'#1a1014')+
+      r(3,6,6,1,'#cabaa0')+
+      r(4,7,1,1,'#3a0e11')+r(5,7,1,1,'#cabaa0')+r(6,7,1,1,'#3a0e11')+r(7,7,1,1,'#cabaa0')+
+      r(4,8,4,1,'#cabaa0')+
+      r(3,9,6,1,'#4a1115')+r(2,10,8,1,'#5a1418')+r(2,11,8,1,'#4a1115')+
+      r(3,12,6,1,'#2a0a0d')+
+      r(3,13,2,1,'#3a0e11')+r(7,13,2,1,'#3a0e11')+
+      r(10,9,1,5,'#6b5436')+r(9,13,3,1,'#5a1418')
+    ),
+  };
+
+  /* ── KNIGHT / Arden — Petir (gold) ─────────────────────── */
+  const knight = {
+    idle: wrap(
+      r(3,0,6,1,'#b8941f')+r(2,1,8,1,'#d8a94b')+
+      r(2,2,8,1,'#e0b552')+r(3,2,6,1,'#f0c860')+
+      r(3,3,1,1,'#8a6a18')+r(4,3,4,1,'#e8d9c0')+r(8,3,1,1,'#8a6a18')+
+      r(4,4,1,1,'#3a2e0e')+r(5,4,2,1,'#e8d9c0')+r(7,4,1,1,'#3a2e0e')+
+      r(4,5,4,1,'#e8d9c0')+
+      r(3,6,6,1,'#5a78a8')+r(2,7,8,1,'#6b8bc0')+
+      r(2,8,1,1,'#5a78a8')+r(3,8,6,1,'#7a9bd0')+r(9,8,1,1,'#5a78a8')+
+      r(4,9,6,1,'#d8a94b')+r(3,9,1,1,'#5a78a8')+
+      r(3,10,6,1,'#4a648c')+
+      r(3,11,6,1,'#3a4e70')+
+      r(3,12,2,1,'#5a78a8')+r(7,12,2,1,'#5a78a8')+
+      r(3,13,2,1,'#2a3850')+r(7,13,2,1,'#2a3850')+
+      r(10,2,1,12,'#c8c8d0')+r(10,1,1,1,'#f0f0f8')+r(9,13,3,1,'#6b5436')+r(9,12,1,1,'#8a6a18')+r(11,12,1,1,'#8a6a18')
+    ),
+    win: wrap(
+      r(3,0,6,1,'#b8941f')+r(2,1,8,1,'#e0b552')+
+      r(2,2,8,1,'#f0c860')+r(3,2,6,1,'#ffe088')+
+      r(3,3,1,1,'#8a6a18')+r(4,3,4,1,'#f0e2c8')+r(8,3,1,1,'#8a6a18')+
+      r(4,4,1,1,'#3a2e0e')+r(5,4,2,1,'#f0e2c8')+r(7,4,1,1,'#3a2e0e')+
+      r(4,5,4,1,'#f0e2c8')+
+      r(3,6,6,1,'#6b8bc0')+r(2,7,8,1,'#7a9bd0')+
+      r(2,8,8,1,'#8aabe0')+
+      r(4,9,6,1,'#f0c860')+
+      r(3,10,6,1,'#5a78a8')+
+      r(3,11,6,1,'#4a648c')+
+      r(3,12,2,1,'#6b8bc0')+r(7,12,2,1,'#6b8bc0')+
+      r(3,13,2,1,'#3a4e70')+r(7,13,2,1,'#3a4e70')+
+      r(10,0,1,10,'#f0f0f8')+r(11,0,1,2,'#ffe088')+r(9,0,1,2,'#ffe088')
+    ),
+    lose: wrap(
+      r(3,3,6,1,'#8a6a18')+r(2,4,8,1,'#b8941f')+
+      r(2,5,8,1,'#c8a838')+r(3,5,6,1,'#d8a94b')+
+      r(3,6,6,1,'#cabaa0')+
+      r(4,7,1,1,'#3a2e0e')+r(5,7,1,1,'#cabaa0')+r(6,7,1,1,'#3a2e0e')+r(7,7,1,1,'#cabaa0')+
+      r(4,8,4,1,'#cabaa0')+
+      r(3,9,6,1,'#4a648c')+r(2,10,8,1,'#5a78a8')+r(2,11,8,1,'#3a4e70')+
+      r(3,12,6,1,'#2a3850')+
+      r(3,13,2,1,'#2a3850')+r(7,13,2,1,'#2a3850')+
+      r(10,9,1,5,'#8a8a90')+r(9,13,3,1,'#6b5436')
+    ),
+  };
+
+  /* ── NINJA / Rin — Bayangan (purple) ───────────────────── */
+  const ninja = {
+    idle: wrap(
+      r(3,0,6,1,'#1a0e26')+r(2,1,8,1,'#2a1a3a')+
+      r(2,2,8,1,'#3a2450')+r(3,2,6,1,'#4a2e64')+
+      r(3,3,6,1,'#2a1a3a')+
+      r(3,4,1,1,'#1a0e26')+r(4,4,4,1,'#d8c4a8')+r(8,4,1,1,'#1a0e26')+
+      r(4,5,1,1,'#b07ad6')+r(5,5,2,1,'#d8c4a8')+r(7,5,1,1,'#b07ad6')+
+      r(3,6,6,1,'#3a2450')+
+      r(3,7,6,1,'#2a1a3a')+r(2,7,1,1,'#3a2450')+r(9,7,1,1,'#3a2450')+
+      r(2,8,8,1,'#3a2450')+
+      r(4,9,6,1,'#b07ad6')+r(3,9,1,1,'#2a1a3a')+
+      r(3,10,6,1,'#241634')+
+      r(3,11,6,1,'#1a0e26')+
+      r(3,12,2,1,'#3a2450')+r(7,12,2,1,'#3a2450')+
+      r(3,13,2,1,'#140a1e')+r(7,13,2,1,'#140a1e')+
+      r(1,5,2,1,'#c8c8d0')+r(0,5,1,1,'#9a9aa8')+r(2,4,1,1,'#3a2450')+r(2,6,1,1,'#3a2450')
+    ),
+    win: wrap(
+      r(3,0,6,1,'#2a1a3a')+r(2,1,8,1,'#3a2450')+
+      r(2,2,8,1,'#4a2e64')+r(3,2,6,1,'#5e3c80')+
+      r(3,3,6,1,'#3a2450')+
+      r(3,4,1,1,'#1a0e26')+r(4,4,4,1,'#e8d4b8')+r(8,4,1,1,'#1a0e26')+
+      r(4,5,1,1,'#c88ae6')+r(5,5,2,1,'#e8d4b8')+r(7,5,1,1,'#c88ae6')+
+      r(3,6,6,1,'#4a2e64')+
+      r(2,7,8,1,'#4a2e64')+r(2,8,8,1,'#5e3c80')+
+      r(4,9,6,1,'#c88ae6')+
+      r(3,10,6,1,'#3a2450')+r(3,11,6,1,'#241634')+
+      r(3,12,2,1,'#4a2e64')+r(7,12,2,1,'#4a2e64')+
+      r(3,13,2,1,'#1a0e26')+r(7,13,2,1,'#1a0e26')+
+      r(11,3,2,1,'#c8c8d0')+r(12,2,1,1,'#e8e8f0')+r(13,1,1,1,'#9a9aa8')+r(10,4,1,1,'#c88ae6')
+    ),
+    lose: wrap(
+      r(3,3,6,1,'#1a0e26')+r(2,4,8,1,'#241634')+
+      r(2,5,8,1,'#2a1a3a')+r(3,5,6,1,'#3a2450')+
+      r(3,6,6,1,'#c4b098')+
+      r(4,7,1,1,'#1a0e26')+r(5,7,1,1,'#c4b098')+r(6,7,1,1,'#1a0e26')+r(7,7,1,1,'#c4b098')+
+      r(4,8,4,1,'#c4b098')+
+      r(3,9,6,1,'#241634')+r(2,10,8,1,'#2a1a3a')+r(2,11,8,1,'#1a0e26')+
+      r(3,12,6,1,'#140a1e')+
+      r(3,13,2,1,'#241634')+r(7,13,2,1,'#241634')+
+      r(2,13,1,1,'#9a9aa8')+r(1,13,1,1,'#6a6a78')
+    ),
+  };
+
+  /* ── ELF / Aoi — Es (teal) ─────────────────────────────── */
+  const elf = {
+    idle: wrap(
+      r(4,0,1,1,'#3a8a86')+r(9,0,1,1,'#3a8a86')+
+      r(3,1,6,1,'#4ca8a2')+r(9,1,1,1,'#3a8a86')+
+      r(2,2,8,1,'#5cc6c0')+r(3,2,6,1,'#7ad8d2')+
+      r(3,3,1,1,'#3a8a86')+r(4,3,4,1,'#e8d9c0')+r(8,3,1,1,'#3a8a86')+
+      r(4,4,1,1,'#2a6a66')+r(5,4,2,1,'#e8d9c0')+r(7,4,1,1,'#2a6a66')+
+      r(4,5,4,1,'#e8d9c0')+
+      r(3,6,6,1,'#4ca8a2')+r(2,7,8,1,'#5cc6c0')+
+      r(2,8,1,1,'#4ca8a2')+r(3,8,6,1,'#7ad8d2')+r(9,8,1,1,'#4ca8a2')+
+      r(4,9,6,1,'#e8d9c0')+r(3,9,1,1,'#4ca8a2')+
+      r(3,10,6,1,'#3a8a86')+r(3,11,6,1,'#2a6a66')+
+      r(3,12,2,1,'#4ca8a2')+r(7,12,2,1,'#4ca8a2')+
+      r(3,13,2,1,'#1f4a47')+r(7,13,2,1,'#1f4a47')+
+      r(1,2,1,11,'#8a6a3a')+r(0,2,1,1,'#5cc6c0')+r(0,12,1,1,'#5cc6c0')+r(1,1,1,1,'#7ad8d2')+r(1,13,1,1,'#7ad8d2')
+    ),
+    win: wrap(
+      r(4,0,1,1,'#4ca8a2')+r(9,0,1,1,'#4ca8a2')+
+      r(3,1,6,1,'#5cc6c0')+
+      r(2,2,8,1,'#7ad8d2')+r(3,2,6,1,'#a8ece8')+
+      r(3,3,1,1,'#3a8a86')+r(4,3,4,1,'#f0e2c8')+r(8,3,1,1,'#3a8a86')+
+      r(4,4,1,1,'#2a6a66')+r(5,4,2,1,'#f0e2c8')+r(7,4,1,1,'#2a6a66')+
+      r(4,5,4,1,'#f0e2c8')+
+      r(3,6,6,1,'#5cc6c0')+r(2,7,8,1,'#7ad8d2')+r(2,8,8,1,'#a8ece8')+
+      r(4,9,6,1,'#f0e2c8')+
+      r(3,10,6,1,'#4ca8a2')+r(3,11,6,1,'#3a8a86')+
+      r(3,12,2,1,'#5cc6c0')+r(7,12,2,1,'#5cc6c0')+
+      r(3,13,2,1,'#2a6a66')+r(7,13,2,1,'#2a6a66')+
+      r(11,1,1,10,'#8a6a3a')+r(11,0,1,1,'#a8ece8')+r(10,5,1,1,'#a8ece8')+r(12,4,1,1,'#a8ece8')
+    ),
+    lose: wrap(
+      r(3,3,6,1,'#2a6a66')+r(2,4,8,1,'#3a8a86')+
+      r(2,5,8,1,'#4ca8a2')+r(3,5,6,1,'#5cc6c0')+
+      r(3,6,6,1,'#d8c8b0')+
+      r(4,7,1,1,'#2a6a66')+r(5,7,1,1,'#d8c8b0')+r(6,7,1,1,'#2a6a66')+r(7,7,1,1,'#d8c8b0')+
+      r(4,8,4,1,'#d8c8b0')+
+      r(3,9,6,1,'#3a8a86')+r(2,10,8,1,'#4ca8a2')+r(2,11,8,1,'#2a6a66')+
+      r(3,12,6,1,'#1f4a47')+
+      r(3,13,2,1,'#2a6a66')+r(7,13,2,1,'#2a6a66')+
+      r(10,10,1,4,'#8a6a3a')+r(10,9,1,1,'#5cc6c0')
+    ),
+  };
+
+  /* ── WIZARD / Kosma — Kosmik (blue) ────────────────────── */
+  const wizard = {
+    idle: wrap(
+      r(6,0,2,1,'#3a4e8a')+r(5,1,4,1,'#4a64a8')+
+      r(4,2,6,1,'#5a78c8')+r(7,2,1,1,'#f0c860')+
+      r(3,3,8,1,'#6b8bf0')+r(4,3,5,1,'#5a78c8')+
+      r(3,4,1,1,'#3a4e8a')+r(4,4,4,1,'#e8d9c0')+r(8,4,1,1,'#3a4e8a')+
+      r(4,5,1,1,'#2a3868')+r(5,5,2,1,'#e8d9c0')+r(7,5,1,1,'#2a3868')+
+      r(4,6,4,1,'#e8d9c0')+
+      r(3,7,6,1,'#4a64a8')+r(2,8,8,1,'#5a78c8')+
+      r(2,9,1,1,'#4a64a8')+r(3,9,6,1,'#6b8bf0')+r(9,9,1,1,'#4a64a8')+
+      r(4,10,3,1,'#f0c860')+
+      r(3,11,6,1,'#3a4e8a')+
+      r(3,12,2,1,'#4a64a8')+r(7,12,2,1,'#4a64a8')+
+      r(3,13,2,1,'#2a3868')+r(7,13,2,1,'#2a3868')+
+      r(10,2,1,12,'#8a6a3a')+r(9,1,3,1,'#f0c860')+r(10,0,1,1,'#ffe088')+r(9,2,1,1,'#ffe088')+r(11,2,1,1,'#ffe088')
+    ),
+    win: wrap(
+      r(6,0,2,1,'#4a64a8')+r(5,1,4,1,'#5a78c8')+
+      r(4,2,6,1,'#6b8bf0')+r(7,2,1,1,'#ffe088')+
+      r(3,3,8,1,'#7a9bff')+
+      r(3,4,1,1,'#3a4e8a')+r(4,4,4,1,'#f0e2c8')+r(8,4,1,1,'#3a4e8a')+
+      r(4,5,1,1,'#2a3868')+r(5,5,2,1,'#f0e2c8')+r(7,5,1,1,'#2a3868')+
+      r(4,6,4,1,'#f0e2c8')+
+      r(3,7,6,1,'#5a78c8')+r(2,8,8,1,'#6b8bf0')+r(2,9,8,1,'#7a9bff')+
+      r(4,10,3,1,'#ffe088')+
+      r(3,11,6,1,'#4a64a8')+
+      r(3,12,2,1,'#5a78c8')+r(7,12,2,1,'#5a78c8')+
+      r(3,13,2,1,'#3a4e8a')+r(7,13,2,1,'#3a4e8a')+
+      r(1,0,1,9,'#8a6a3a')+r(0,0,3,1,'#ffe088')+r(1,1,1,1,'#ffe088')+r(0,2,1,1,'#fff0b0')+r(2,2,1,1,'#fff0b0')
+    ),
+    lose: wrap(
+      r(6,2,2,1,'#2a3868')+r(5,3,4,1,'#3a4e8a')+
+      r(4,4,6,1,'#4a64a8')+r(3,5,8,1,'#5a78c8')+
+      r(3,6,6,1,'#d8c8b0')+
+      r(4,7,1,1,'#2a3868')+r(5,7,1,1,'#d8c8b0')+r(6,7,1,1,'#2a3868')+r(7,7,1,1,'#d8c8b0')+
+      r(4,8,4,1,'#d8c8b0')+
+      r(3,9,6,1,'#3a4e8a')+r(2,10,8,1,'#4a64a8')+r(2,11,8,1,'#2a3868')+
+      r(3,12,6,1,'#1e2848')+
+      r(3,13,2,1,'#2a3868')+r(7,13,2,1,'#2a3868')+
+      r(10,10,1,4,'#8a6a3a')+r(9,9,3,1,'#5a6a8a')+r(10,9,1,1,'#7a8aaa')
+    ),
+  };
+
+  const ALL = { reaper, knight, ninja, elf, wizard };
+
+  function get(charId, state) {
+    const c = ALL[charId] || ALL.reaper;
+    return c[state] || c.idle;
+  }
+
+  return { get, ALL };
+})();
+
+if (typeof window !== 'undefined') window.SPRITES = SPRITES;
+</script>
+<script>/* ============================================================
+   fx.js — efek tebasan per elemen (vanilla, port dari fx.jsx)
+   Dipanggil: FX.slash(laneEl, element, color)
+   ============================================================ */
+const FX = (() => {
+
+  function el(tag, style, parent) {
+    const d = document.createElement(tag);
+    Object.assign(d.style, style);
+    if (parent) parent.appendChild(d);
+    return d;
+  }
+
+  function burst(parent, n, color, kind, spread = 120, size = 10, dur = 540) {
+    for (let i = 0; i < n; i++) {
+      const ang = (i / n) * Math.PI * 2 + Math.random() * 0.5;
+      const dist = spread * (0.5 + Math.random() * 0.7);
+      const tx = Math.cos(ang) * dist, ty = Math.sin(ang) * dist;
+      const s = size * (0.6 + Math.random() * 0.8);
+      const delay = Math.random() * 90;
+      const p = el('div', {
+        position: 'absolute', top: '50%', left: '50%', width: s + 'px', height: s + 'px',
+        pointerEvents: 'none',
+        animation: `${kind === 'drop' ? 'fxDrop' : 'fxBurst'} ${dur}ms cubic-bezier(.2,.7,.3,1) ${delay}ms both`,
+      }, parent);
+      p.style.setProperty('--tx', tx + 'px');
+      p.style.setProperty('--ty', ty + 'px');
+      p.style.setProperty('--rot', (Math.random() * 360) + 'deg');
+      if (kind === 'shard') {
+        p.style.height = (s * 2.2) + 'px';
+        p.style.background = `linear-gradient(${color}, transparent)`;
+        p.style.clipPath = 'polygon(50% 0, 100% 100%, 0 100%)';
+        p.style.filter = `drop-shadow(0 0 5px ${color})`;
+      } else if (kind === 'star') {
+        p.style.background = color;
+        p.style.clipPath = 'polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)';
+        p.style.filter = `drop-shadow(0 0 6px ${color})`;
+      } else if (kind === 'drop') {
+        p.style.width = (s * 0.7) + 'px';
+        p.style.height = (s * 1.3) + 'px';
+        p.style.background = color;
+        p.style.borderRadius = '60% 60% 60% 0';
+        p.style.filter = `drop-shadow(0 0 4px ${color})`;
+      } else {
+        p.style.borderRadius = '50%';
+        p.style.background = color;
+        p.style.boxShadow = `0 0 8px ${color}`;
+      }
+    }
+  }
+
+  function tintSlash(parent, color, soft) {
+    const s = el('div', {
+      position: 'absolute', top: '50%', left: '50%', width: '240%', height: '16px',
+      marginLeft: '-120%', marginTop: '-8px',
+      background: `linear-gradient(90deg, transparent, #fff 42%, ${soft || '#fff'} 52%, transparent)`,
+      boxShadow: `0 0 28px ${color}`, animation: 'fxSlashTint .55s ease forwards', pointerEvents: 'none',
+    }, parent);
+  }
+
+  // Tampilkan efek pada lane pemenang
+  function slash(laneEl, element, color) {
+    if (!laneEl) return;
+    const layer = el('div', {
+      position: 'absolute', inset: '0', zIndex: '8', pointerEvents: 'none', overflow: 'visible',
+    }, laneEl);
+    const center = el('div', { position: 'absolute', top: '48%', left: '0', right: '0' }, layer);
+
+    // Flash arena-lokal
+    el('div', {
+      position: 'absolute', inset: '0',
+      background: `radial-gradient(60% 70% at 50% 55%, ${color}, transparent 70%)`,
+      animation: 'fxFlash .5s ease forwards', mixBlendMode: 'screen',
+    }, laneEl);
+
+    if (element === 'Petir') {
+      tintSlash(center, color, '#ffe9a8'); burst(center, 10, color, 'spark', 130);
+    } else if (element === 'Es') {
+      tintSlash(center, color, '#dffbfb'); burst(center, 12, color, 'shard', 130, 11);
+    } else if (element === 'Kosmik') {
+      el('div', { position:'absolute', top:'50%', left:'50%', width:'120px', height:'120px',
+        marginLeft:'-60px', marginTop:'-60px', borderRadius:'50%', border:`3px solid ${color}`,
+        animation:'fxRing .55s ease forwards' }, center);
+      tintSlash(center, color, '#dfe6ff'); burst(center, 11, color, 'star', 140, 13);
+    } else if (element === 'Bayangan') {
+      [0,70,140].forEach(d => {
+        el('div', { position:'absolute', top:'50%', left:'50%', width:'230%', height:'13px',
+          marginLeft:'-115%', marginTop:'-6px',
+          background:`linear-gradient(90deg, transparent, ${color} 50%, transparent)`,
+          boxShadow:`0 0 22px ${color}`, animation:`fxShadowSlash .55s ease ${d}ms forwards` }, center);
+      });
+      burst(center, 8, color, 'dot', 110);
+    } else { // Darah / default
+      tintSlash(center, color, '#ff8a8f'); burst(center, 14, color, 'drop', 120, 12);
+    }
+
+    setTimeout(() => layer.remove(), 700);
+  }
+
+  // Camera shake pada elemen panggung
+  const SHAKE_BY_ELEMENT = { Petir:'shake-hard', Darah:'shake-rumble', Bayangan:'shake-flicker', Es:'shake-soft', Kosmik:'shake-soft' };
+  function shake(stageEl, element) {
+    const cls = SHAKE_BY_ELEMENT[element] || 'shake-soft';
+    stageEl.classList.add(cls);
+    setTimeout(() => stageEl.classList.remove(cls), 600);
+  }
+
+  // Sakura jatuh — isi sebuah .petal-field
+  function spawnPetals(fieldEl, n = 12) {
+    if (!fieldEl) return;
+    fieldEl.innerHTML = '';
+    for (let i = 0; i < n; i++) {
+      const size = 6 + Math.random() * 9;
+      const p = el('div', {
+        left: (Math.random() * 100) + '%',
+        width: size + 'px', height: (size * 0.78) + 'px',
+        transform: `rotate(${Math.random()*360}deg)`,
+        animation: `petalFall ${9 + Math.random()*9}s linear ${-Math.random()*14}s infinite`,
+      }, fieldEl);
+      p.className = 'petal';
+    }
+  }
+
+  return { slash, shake, spawnPetals, SHAKE_BY_ELEMENT };
+})();
+</script>
+<script>/* ============================================================
+   game-canvas.js — DuelRenderer (DOM + sprite pixel SVG)
+   Tema RETRO: sprite dari sprites.js, animasi CSS idle/win/lose.
+   ROSTER 5 karakter bernama. Sistem match/room TIDAK diubah.
+   ============================================================ */
+
+const ROSTER = [
+  { id:"reaper", name:"Mira",  role:"Scythe Heir",    element:"Blood",   color:"#d23b40" },
+  { id:"knight", name:"Arden", role:"Knight of Light",   element:"Lightning",   color:"#e0b552" },
+  { id:"ninja",  name:"Rin",   role:"Shadow Ninja",   element:"Shadow",color:"#b07ad6" },
+  { id:"elf",    name:"Aoi",   role:"Elf Archer",      element:"Ice",      color:"#5cc6c0" },
+  { id:"wizard", name:"Kosma", role:"Star Mage", element:"Cosmic",  color:"#6b8bf0" },
+];
+if (typeof window !== 'undefined') window.ROSTER = ROSTER;
+
+class DuelRenderer {
+  constructor(arenaEl, centerEl, stageEl) {
+    this.arena  = arenaEl;
+    this.center = centerEl;
+    this.stage  = stageEl;
+    this.lanes  = [];
+    this.players = [];
+  }
+
+  setPlayers(names, myName, charMap = {}) {
+    this.players = names.map((name, i) => ({
+      name, isMe: name === myName,
+      charIdx: charMap[name] != null ? charMap[name] : (i % ROSTER.length),
+    }));
+    this._buildLanes();
+  }
+
+  _spriteHTML(charId, state) {
+    return (typeof SPRITES !== 'undefined') ? SPRITES.get(charId, state) : '';
+  }
+
+  _buildLanes() {
+    this.arena.innerHTML = '';
+    this.lanes = [];
+    const n = this.players.length;
+    this.players.forEach((p, i) => {
+      const char = ROSTER[p.charIdx % ROSTER.length];
+      const lane = document.createElement('div');
+      lane.className = 'duel-lane';
+
+      const pips = document.createElement('div');
+      pips.className = 'duel-lane-pips';
+
+      const sprite = document.createElement('div');
+      sprite.className = 'duel-sprite';
+      const holder = document.createElement('div');
+      holder.className = 'spr-holder idle';
+      holder.innerHTML = this._spriteHTML(char.id, 'idle');
+      if (i >= Math.ceil(n / 2)) holder.style.transform = 'scaleX(-1)';
+      sprite.appendChild(holder);
+
+      const platform = document.createElement('div');
+      platform.className = 'duel-platform';
+      sprite.appendChild(platform);
+
+      const badge = document.createElement('div');
+      badge.className = 'duel-badge';
+      badge.style.display = 'none';
+      sprite.appendChild(badge);
+
+      const nm = document.createElement('div');
+      nm.className = 'duel-name';
+      nm.innerHTML = `<div class="nm${p.isMe?' me':''}">${esc(p.name)}</div>
+                      <div class="el" style="color:${char.color}">${p.isMe?'YOU':char.element}</div>`;
+
+      lane.appendChild(pips);
+      lane.appendChild(sprite);
+      lane.appendChild(nm);
+      this.arena.appendChild(lane);
+
+      this.lanes.push({ el:lane, sprite, holder, badge, pips, char, isMe:p.isMe, name:p.name, flip:i>=Math.ceil(n/2) });
+    });
+  }
+
+  _setState(L, state) {
+    L.holder.innerHTML = this._spriteHTML(L.char.id, state);
+    L.holder.className = 'spr-holder ' + (state === 'win' ? 'win win-glow' : state === 'lose' ? 'lose' : 'idle');
+    if (L.flip) L.holder.style.transform = 'scaleX(-1)';
+  }
+
+  setScores(scores, totalRounds) {
+    this.lanes.forEach(L => {
+      const s = scores[L.name] || 0;
+      L.pips.innerHTML = '';
+      for (let k = 0; k < totalRounds; k++) {
+        const pip = document.createElement('span');
+        pip.className = 'duel-lane-pip' + (k < s ? ' on' : '');
+        L.pips.appendChild(pip);
+      }
+    });
+  }
+
+  resetRound() {
+    this.lanes.forEach(L => {
+      L.el.classList.remove('dim');
+      this._setState(L, 'idle');
+      L.badge.style.display = 'none';
+    });
+    this.center.innerHTML = '';
+  }
+
+  showCount(n) { this.center.innerHTML = `<div class="px-count">${n}</div>`; }
+
+  showWait() {
+    this.center.innerHTML =
+      `<div class="px-prompt"><div class="kanji-pixel">待</div><div class="px-label">HOLD!</div></div>`;
+  }
+
+  showSignal(target) {
+    let t = '';
+    if (target) {
+      if (target.type === 'key') t = `<div class="px-target">PRESS [ ${esc(target.value)} ]</div>`;
+      else { const m={left:'LEFT CLICK',right:'RIGHT CLICK',middle:'MIDDLE CLICK'}[target.value]||'CLICK'; t=`<div class="px-target">${m}</div>`; }
+    }
+    this.center.innerHTML = `<div class="px-prompt signal"><div class="kanji-pixel slash">斬</div><div class="px-signal">STRIKE!</div>${t}</div>`;
+    this.stage.classList.add('flash-crimson');
+    setTimeout(() => this.stage.classList.remove('flash-crimson'), 350);
+  }
+
+  clearSignalBg() { this.center.innerHTML = ''; }
+
+  showResult(results, earlyEnded, culprit) {
+    const byName = {}; results.forEach(r => byName[r.username] = r);
+    const winner = results.find(r => r.rank === 1 && !r.is_early && r.rt < 9000);
+
+    this.lanes.forEach(L => {
+      const r = byName[L.name];
+      const won = winner && r && r.username === winner.username;
+      if (won) {
+        this._setState(L, 'win');
+        L.el.classList.remove('dim');
+        if (typeof FX !== 'undefined') { FX.slash(L.el, L.char.element, L.char.color); FX.shake(this.stage, L.char.element); }
+      } else {
+        this._setState(L, 'lose');
+        L.el.classList.add('dim');
+      }
+      if (r && won) {
+        // Pemenang: tulisan WIN! besar di atas kepala
+        L.badge.style.display = '';
+        L.badge.className = 'duel-badge win';
+        L.badge.textContent = 'WIN! ' + (r.rt < 9000 ? r.rt + 'ms' : '');
+      } else if (r && r.is_early) {
+        // Early click: tulisan peringatan
+        L.badge.style.display = '';
+        L.badge.className = 'duel-badge flinch';
+        L.badge.textContent = 'FLINCH!';
+      } else {
+        // Kalah biasa: tidak ada tulisan, cukup redup
+        L.badge.style.display = 'none';
+      }
+    });
+    this.center.innerHTML = '';
+  }
+
+  static buildRoundPips(container, total, current, finished) {
+    container.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+      const pip = document.createElement('span');
+      let cls = 'duel-pip';
+      if (i + 1 < current || (i + 1 === current && finished)) cls += ' done';
+      else if (i + 1 === current) cls += ' current';
+      pip.className = cls;
+      container.appendChild(pip);
+    }
+  }
+
+  destroy() { this.arena.innerHTML=''; this.center.innerHTML=''; }
+}
+
+if (typeof esc === 'undefined') {
+  window.esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+if (typeof window !== 'undefined') window.DuelRenderer = DuelRenderer;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=$('screen-'+name); if(el) el.classList.add('active');
+  document.querySelectorAll('#preview-bar button[data-s]').forEach(b=>b.classList.toggle('active',b.dataset.s===name));
+}
+if(typeof FX!=='undefined'){FX.spawnPetals($('loading-petals'),10);FX.spawnPetals($('login-petals'),9);FX.spawnPetals($('reg-petals'),9);if($('stats-petals'))FX.spawnPetals($('stats-petals'),14);}
+if(typeof SPRITES!=='undefined'){
+  if($('login-hero'))$('login-hero').innerHTML='<div class="spr-holder">'+SPRITES.get('knight','idle')+'</div>';
+  if($('reg-hero'))$('reg-hero').innerHTML='<div class="spr-holder">'+SPRITES.get('reaper','idle')+'</div>';
+}
+(function(){let p=0;const f=$('loading-fill'),pc=$('loading-pct'),st=$('loading-step');
+const steps=['forging the blade','painting the night','summoning the wind','connecting the dojo','sharpening reflexes'];
+setInterval(()=>{p=(p+3)%100;if(f)f.style.width=p+'%';if(pc)pc.textContent=Math.floor(p)+'%';if(st)st.textContent=steps[Math.floor(p/100*steps.length)];},150);})();
+$('menu-username-label')&&($('menu-username-label').textContent='deadyiss · 名');
+$('room-count-badge')&&($('room-count-badge').textContent='3');
+$('room-list-container')&&($('room-list-container').innerHTML=[
+{code:'3AD54E',host:'deadyiss',players:2,max:4,rounds:5,status:'waiting',pin:false},
+{code:'KX9P2M',host:'rina',players:3,max:5,rounds:7,status:'playing',pin:true},
+{code:'ZZ4Q1A',host:'budi',players:1,max:2,rounds:3,status:'waiting',pin:false},
+].map(r=>`<div class="room-card ${r.status==='playing'?'playing':''}"><div class="room-card-top"><span class="room-card-code">${r.pin?'🔒 ':''}${r.code}</span><span class="room-card-status ${r.status==='playing'?'status-playing':'status-waiting'}">${r.status==='playing'?'▶ playing':'⏳ waiting'}</span></div><div class="room-card-info"><span>👤 ${r.players}/${r.max}</span><span>⚔ ${r.rounds} rounds</span><span>${r.host}</span></div></div>`).join(''));
+$('chat-messages')&&($('chat-messages').innerHTML=[
+{u:'rina',t:'anyone up for a duel?',time:'08:12',mine:false},
+{u:'deadyiss',t:'lets go, making a room',time:'08:13',mine:true},
+{u:'budi',t:'wait for me to join',time:'08:13',mine:false},
+].map(m=>`<div class="chat-msg ${m.mine?'mine':''}"><div class="chat-user">${m.u} <span class="chat-time">${m.time}</span></div><div>${m.t}</div></div>`).join(''));
+let previewCharIdx=0;
+function renderPreviewRoster(){if(!$('char-roster'))return;const taken={1:'bluejiws'};
+$('char-roster').innerHTML=ROSTER.map((c,i)=>{const tk=taken[i]!=null&&i!==previewCharIdx;
+return `<div class="char-chip ${i===previewCharIdx?'active':''} ${tk?'taken':''}" onclick="previewPickChar(${i})">${SPRITES.get(c.id,'idle')}${tk?`<span class="char-taken-tag">${taken[i]}</span>`:''}</div>`;}).join('');
+const c=ROSTER[previewCharIdx];
+$('char-preview').innerHTML=`<div class="char-preview-name"><div class="brush-title" style="font-size:13px;color:${c.color}">${esc(c.name)}</div><div class="label">${esc(c.role)} · ${esc(c.element)}</div></div><div class="preview-spr"><div class="spr-holder">${SPRITES.get(c.id,'idle')}</div></div>`;}
+window.previewPickChar=i=>{if({1:'bluejiws'}[i]&&i!==previewCharIdx)return;previewCharIdx=i;renderPreviewRoster();};
+renderPreviewRoster();
+$('room-code-display')&&($('room-code-display').textContent='3AD54E');
+$('room-count')&&($('room-count').textContent='2');$('room-max')&&($('room-max').textContent='4');
+$('rounds-label')&&($('rounds-label').textContent='ROUNDS: 5');
+$('room-player-list')&&($('room-player-list').innerHTML=`<li><span class="dot dot-live"></span>deadyiss<span class="player-badge">HOST</span><span class="mono" style="color:var(--gold-soft);font-size:10px;margin-left:4px">(you)</span><span class="mono" style="color:var(--paper-3);font-size:11px;margin-left:auto">Mira</span></li><li><span class="dot dot-live"></span>bluejiws<span class="mono" style="color:var(--paper-3);font-size:11px;margin-left:auto">Arden</span></li>`);
+$('host-controls')&&($('host-controls').style.display='block');$('guest-waiting')&&($('guest-waiting').style.display='none');
+$('btn-start-game')&&($('btn-start-game').disabled=false);
+let dr=null;
+function setupDuel(){dr=new DuelRenderer($('duel-arena'),$('duel-center'),$('screen-game'));
+dr.setPlayers(['deadyiss','bluejiws','Kage-Bot3','Aoi-Bot4'],'deadyiss',{deadyiss:0,bluejiws:1,'Kage-Bot3':2,'Aoi-Bot4':3});
+dr.setScores({deadyiss:2,bluejiws:1,'Kage-Bot3':1,'Aoi-Bot4':0},5);
+$('game-room-label')&&($('game-room-label').textContent='ROOM: 3AD54E');
+$('game-round-label')&&($('game-round-label').textContent='ROUND 3/5');
+DuelRenderer.buildRoundPips($('duel-round-pips'),5,3,false);}
+let duelPhase=0;
+function cycleDuel(){if(!dr||!$('screen-game').classList.contains('active'))return;duelPhase=(duelPhase+1)%3;
+if(duelPhase===1){dr.resetRound();dr.showWait();}
+else if(duelPhase===2){dr.showSignal({type:'key',value:'J'});}
+else{dr.showResult([{username:'deadyiss',rt:842,is_early:false,rank:1},{username:'bluejiws',rt:1120,is_early:false,rank:2},{username:'Kage-Bot3',rt:1340,is_early:false,rank:3},{username:'Aoi-Bot4',rt:9999,is_early:false,rank:4}],false,null);}}
+setInterval(cycleDuel,1600);
+function setupVictory(){$('winner-name')&&($('winner-name').textContent='deadyiss');
+$('winner-kanji')&&($('winner-kanji').textContent='勝',$('winner-kanji').style.color='var(--gold)');
+$('victory-sub')&&($('victory-sub').textContent='YOU ARE THE CHAMPION');
+const stats={deadyiss:{points:13,avg_rt:868,best_rt:780,rt_history:[820,910,842,860,910],ci:0},bluejiws:{points:9,avg_rt:1080,best_rt:980,rt_history:[1100,1050,1120,1040,1090],ci:1},'Kage-Bot3':{points:6,avg_rt:1290,best_rt:1180,rt_history:[1300,1250,1340,1280,1290],ci:2},'Aoi-Bot4':{points:3,avg_rt:1480,best_rt:1390,rt_history:[1500,1450,1480,1460,1510],ci:3}};
+const ranked=Object.entries(stats).map(([u,s])=>({uname:u,...s,charIdx:s.ci})).sort((a,b)=>b.points-a.points);
+const order=[1,0,2,3];
+$('victory-podium')&&($('victory-podium').innerHTML=order.map(idx=>{const p=ranked[idx],rank=idx+1,c=ROSTER[p.charIdx],w=rank===1;const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'#'+rank;
+return `<div class="podium-slot ${w?'champ':''}"><div class="podium-medal">${medal}</div><div class="podium-spr"><div class="spr-holder ${w?'win win-glow':''}">${SPRITES.get(c.id,w?'win':'lose')}</div></div><div class="podium-base" style="--c:${c.color}"><div class="podium-name ${p.uname==='deadyiss'?'me':''}">${esc(p.uname)}${p.uname==='deadyiss'?' ·YOU':''}</div><div class="podium-pts">${p.points} <span>pt</span></div></div></div>`;}).join(''));
+$('all-player-stats')&&($('all-player-stats').innerHTML=ranked.map((s,i)=>{const c=ROSTER[s.charIdx],me=s.uname==='deadyiss';
+return `<div class="rank-row ${me?'me':''} ${i===0?'first':''}"><div class="rank-num">${i+1}</div><div class="rank-spr">${SPRITES.get(c.id,'idle')}</div><div class="rank-info"><div class="rank-name">${esc(s.uname)}${me?' (you)':''}${i===0?' 🏆':''}</div><div class="rank-stats"><span><b class="gold-text">${s.points}</b> pts</span><span><b>${s.avg_rt}</b>ms avg</span><span><b style="color:var(--jade)">${s.best_rt}</b>ms best</span></div></div></div>`;}).join(''));
+const ctx=$('rt-chart')&&$('rt-chart').getContext('2d');
+if(ctx&&typeof Chart!=='undefined'){if(window._pvChart)window._pvChart.destroy();
+window._pvChart=new Chart(ctx,{type:'line',data:{labels:['R1','R2','R3','R4','R5'],datasets:ranked.map(s=>({label:s.uname,data:s.rt_history,borderColor:['#d23b40','#e0b552','#b07ad6','#5cc6c0','#6b8bf0'][s.charIdx],backgroundColor:'transparent',tension:.3,fill:false,pointRadius:4}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#8d8474',font:{size:10}}}},scales:{y:{ticks:{color:'#8d8474'},grid:{color:'#251e34'}},x:{ticks:{color:'#8d8474'},grid:{color:'#251e34'}}}}});}}
+document.querySelectorAll('#preview-bar button[data-s]').forEach(b=>{b.onclick=()=>{const s=b.dataset.s;showScreen(s);if(s==='game'){setupDuel();duelPhase=0;}if(s==='stats'){setupVictory();}};});
+let autoTimer=null;
+$('pv-auto').onclick=function(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;this.textContent='▶ Auto Tour';return;}
+this.textContent='⏸ Stop Tour';const seq=['loading','login','register','menu','room','game','stats'];let i=0;
+const go=()=>{const s=seq[i%seq.length];showScreen(s);if(s==='game'){setupDuel();duelPhase=0;}if(s==='stats'){setupVictory();}i++;};
+go();autoTimer=setInterval(go,4000);};
+showScreen('loading');setTimeout(()=>showScreen('login'),2600);
+</script>
+</body></html>
