@@ -7,6 +7,9 @@ Game duel refleks _real-time_ multiplayer berbasis web. Saat kanji **斬 (tebas)
 Program Studi Teknik Informatika, Fakultas Teknologi Informasi
 Universitas Islam Kalimantan Muhammad Arsyad Al-Banjari · 2026
 
+## Preview game
+Link : https://deadyiss.github.io/reflection-showdown-game/
+
 ---
 
 ## Anggota Kelompok
@@ -26,8 +29,8 @@ Universitas Islam Kalimantan Muhammad Arsyad Al-Banjari · 2026
 | Dokumen | Tautan |
 |---------|--------|
 | Video Demo | https://example.com/demo-video _(placeholder — ganti nanti)_ |
-| Proposal (PDF) | https://drive.google.com/file/d/1X_uVMACVk732FzsVR4cM3pBQuXdcz9t9/view?usp=drive_link |
-| Laporan Akhir (PDF) | https://drive.google.com/file/d/1raLDaigeNcH8tLz7o-yCrxOgtcXi5jc3/view?usp=drive_link |
+| Proposal (PDF) | docs\pdf\Proposal_ReflexShowdown_Kelompok2.pdf |
+| Laporan Akhir (PDF) | docs\pdf\Laporan_Akhir_ReflexShowdown_Kelompok2.pdf |
 | Slide Presentasi (PDF) | https://example.com/slides _(placeholder — ganti nanti)_ |
 
 ---
