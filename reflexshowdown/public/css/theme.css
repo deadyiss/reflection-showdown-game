@@ -1,0 +1,149 @@
+/* ============================================================
+   theme.css — RETRO PIXEL THEME · 刃影 Blade & Shadow
+   Font pixel (Press Start 2P), palet crimson+gold, gelap.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap');
+
+:root{
+  --ink-900:#0e0b16; --ink-800:#13101e; --ink-700:#1a1320; --ink-600:#251a2e;
+  --crimson:#d23b40; --crimson-deep:#8f2226; --crimson-dark:#5a1418;
+  --gold:#d8a94b; --gold-soft:#e0b552; --gold-bright:#f0c860;
+  --jade:#5fae84; --purple:#b07ad6; --teal:#5cc6c0; --blue:#6b8bf0;
+  --paper:#e8e2d4; --paper-2:#c8bda9; --paper-3:#8d8474;
+  --hairline:#3a2a3e; --hairline-gold:#d8a94b44;
+  --font-px:'Press Start 2P',monospace;
+  --font-dot:'DotGothic16',monospace;
+  --font-mono:'DotGothic16',monospace;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--ink-900);
+  color:var(--paper);
+  font-family:var(--font-dot);
+  font-size:15px;
+  image-rendering:pixelated;
+  overflow:hidden;
+}
+
+/* Scanline overlay global */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 2px,rgba(0,0,0,.10) 3px,rgba(0,0,0,0) 4px);
+  mix-blend-mode:multiply;
+}
+
+/* ── Panggung dasar ───────────────────────────────────────── */
+.stage{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--ink-900)}
+.grain{background-image:
+  repeating-linear-gradient(0deg,#0e0b16 0px,#0e0b16 7px,#100c1a 7px,#100c1a 8px);}
+
+/* ── Kanji & judul ───────────────────────────────────────── */
+.kanji{font-family:var(--font-dot);font-weight:700}
+.brush-title{font-family:var(--font-px);line-height:1.5;letter-spacing:1px}
+.hero-ink{color:var(--crimson);text-shadow:3px 3px 0 var(--crimson-dark)}
+.label{font-family:var(--font-px);font-size:9px;letter-spacing:1px;color:var(--paper-3);text-transform:uppercase;line-height:1.6}
+.mono{font-family:var(--font-dot)}
+.gold-text{color:var(--gold)}
+
+/* ── Tombol pixel (border kotak, shadow blok) ────────────── */
+.btn{
+  font-family:var(--font-px);font-size:10px;letter-spacing:1px;
+  padding:12px 16px;border:none;cursor:pointer;text-transform:uppercase;
+  color:var(--paper);background:var(--ink-600);
+  box-shadow:0 4px 0 #000, inset 0 0 0 2px var(--hairline);
+  transition:transform .08s var(--ease),box-shadow .08s var(--ease);
+  position:relative;line-height:1.5;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 #000, inset 0 0 0 2px var(--gold)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #000, inset 0 0 0 2px var(--hairline)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-primary{background:var(--crimson-deep);box-shadow:0 4px 0 #2a0a0d, inset 0 0 0 2px var(--crimson)}
+.btn-primary:hover{box-shadow:0 6px 0 #2a0a0d, inset 0 0 0 2px var(--gold)}
+.btn-primary:active{box-shadow:0 1px 0 #2a0a0d, inset 0 0 0 2px var(--crimson)}
+.btn-ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--hairline)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 2px var(--gold);transform:translateY(-1px)}
+.btn-block{width:100%}
+
+/* ── Panel pixel ─────────────────────────────────────────── */
+.panel{
+  background:var(--ink-800);
+  box-shadow:inset 0 0 0 2px var(--hairline), 0 4px 0 #000;
+  position:relative;
+}
+.panel.ticks{box-shadow:inset 0 0 0 2px var(--gold-soft), 0 4px 0 #000}
+
+/* ── Input pixel ─────────────────────────────────────────── */
+.input,select.input{
+  width:100%;font-family:var(--font-dot);font-size:15px;
+  padding:10px 12px;color:var(--paper);background:var(--ink-700);
+  border:none;box-shadow:inset 0 0 0 2px var(--hairline);outline:none;
+}
+.input:focus{box-shadow:inset 0 0 0 2px var(--gold)}
+.field{display:block;margin-bottom:12px}
+.field .label{display:block;margin-bottom:5px}
+
+/* ── Rule / pemisah ──────────────────────────────────────── */
+.rule{text-align:center;color:var(--gold);font-size:10px;letter-spacing:2px}
+
+/* ── Dot status ──────────────────────────────────────────── */
+.dot{display:inline-block;width:8px;height:8px}
+.dot-idle{background:var(--gold);animation:blink 1s steps(2) infinite}
+.dot-live{background:var(--jade)}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ── Hinomaru (matahari) ─────────────────────────────────── */
+.hinomaru{background:var(--crimson);border-radius:50%;box-shadow:0 0 0 4px var(--crimson-dark)}
+
+/* ── Animasi sprite ──────────────────────────────────────── */
+.pixel-spr{image-rendering:pixelated;display:block;width:100%;height:100%}
+.spr-holder{width:100%;height:100%;display:flex;align-items:flex-end;justify-content:center}
+.spr-holder.idle{animation:bob 1.6s steps(2,end) infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.spr-holder.idle[style*="scaleX(-1)"]{animation:bobFlip 1.6s steps(2,end) infinite}
+@keyframes bobFlip{0%,100%{transform:scaleX(-1) translateY(0)}50%{transform:scaleX(-1) translateY(-5px)}}
+.spr-holder.win{animation:winjump .9s ease-in-out infinite}
+@keyframes winjump{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-16px) rotate(-5deg)}60%{transform:translateY(-7px) rotate(4deg)}}
+.spr-holder.lose{animation:loseshake .5s steps(3,end) infinite;opacity:.78}
+@keyframes loseshake{0%,100%{transform:translateX(0)}33%{transform:translateX(-3px) rotate(-2deg)}66%{transform:translateX(3px) rotate(2deg)}}
+.win-glow{filter:drop-shadow(0 0 5px var(--gold)) drop-shadow(0 0 10px var(--gold))}
+
+/* ── Animasi umum ────────────────────────────────────────── */
+.anim-fadeup{animation:fadeup .5s var(--ease) both}
+.anim-fadein{animation:fadein .5s var(--ease) both}
+.anim-floaty{animation:floaty 3s ease-in-out infinite}
+.delay-1{animation-delay:.15s}.delay-2{animation-delay:.3s}
+@keyframes fadeup{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes countPop{0%{transform:scale(2.4);opacity:0}40%{opacity:1}100%{transform:scale(1);opacity:1}}
+
+.scroll{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--hairline) transparent}
+.scroll::-webkit-scrollbar{width:8px}
+.scroll::-webkit-scrollbar-thumb{background:var(--hairline)}
+
+/* Flash crimson saat sinyal */
+.flash-crimson{animation:flashC .35s steps(2) }
+@keyframes flashC{0%,100%{background-color:transparent}50%{background-color:rgba(210,59,64,.18)}}
+
+/* Camera shake (dipakai fx.js) */
+.shake-hard{animation:shHard .4s steps(4)}
+.shake-rumble{animation:shRumble .5s steps(5)}
+.shake-flicker{animation:shFlicker .4s steps(6)}
+.shake-soft{animation:shSoft .35s steps(3)}
+.shake{animation:shSoft .3s steps(3)}
+@keyframes shHard{0%,100%{transform:translate(0,0)}25%{transform:translate(-6px,3px)}50%{transform:translate(6px,-3px)}75%{transform:translate(-4px,2px)}}
+@keyframes shRumble{0%,100%{transform:translate(0,0)}20%{transform:translate(3px,2px)}40%{transform:translate(-3px,-2px)}60%{transform:translate(2px,3px)}80%{transform:translate(-2px,-2px)}}
+@keyframes shFlicker{0%,100%{transform:translate(0,0);opacity:1}50%{transform:translate(2px,-1px);opacity:.85}}
+@keyframes shSoft{0%,100%{transform:translate(0,0)}33%{transform:translate(-2px,1px)}66%{transform:translate(2px,-1px)}}
+
+/* FX particles keyframes (dipakai fx.js) */
+@keyframes fxBurst{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.3) rotate(var(--rot));opacity:0}}
+@keyframes fxDrop{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty) + 30px)) scale(.4);opacity:0}}
+@keyframes fxSlashTint{0%{transform:scaleX(0);opacity:0}40%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@keyframes fxShadowSlash{0%{transform:scaleX(0);opacity:0}50%{transform:scaleX(1);opacity:.9}100%{transform:scaleX(1);opacity:0}}
+@keyframes fxRing{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.6);opacity:0}}
+@keyframes fxFlash{0%{opacity:.7}100%{opacity:0}}

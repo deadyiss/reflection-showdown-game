@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>刃影 · Reflex Showdown — Iai Duel</title>
+<link rel="stylesheet" href="css/theme.css" />
+<link rel="stylesheet" href="css/style.css" />
+<link href="https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<!-- ═══ SCREEN: LOADING ═══════════════════════════════════════════════ -->
+<div id="screen-loading" class="screen stage grain active">
+  <div class="petal-field" id="loading-petals"></div>
+  <div class="loading-center">
+    <div class="loading-ring-wrap">
+      <div class="loading-ring"></div>
+      <div class="hinomaru anim-floaty" style="width:92px;height:92px"></div>
+      <div class="kanji loading-kanji">刃</div>
+    </div>
+    <div>
+      <div class="brush-title hero-ink anim-fadeup" style="font-size:52px">刃影</div>
+      <div class="label anim-fadeup delay-1" style="margin-top:6px">BLADE & SHADOW · REFLEX DUEL</div>
+    </div>
+    <div class="anim-fadeup delay-2" style="width:320px;max-width:70vw">
+      <div class="loading-bar"><div class="loading-fill" id="loading-fill"></div></div>
+      <div class="mono loading-status">
+        <span id="loading-step">forging the blade</span>
+        <span class="gold-text" id="loading-pct">0%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: AUTH (Login + Register) ═══════════════════════════════ -->
+<div id="screen-login" class="screen stage grain auth-shell">
+  <div class="auth-brand">
+    <div class="auth-brand-glow"></div>
+    <div class="petal-field" id="login-petals"></div>
+    <div class="auth-hero" id="login-hero"></div>
+    <div class="auth-brand-logo">
+      <div class="brush-title hero-ink" style="font-size:40px">刃影</div>
+      <div class="label" style="margin-top:4px">BLADE & SHADOW</div>
+    </div>
+    <div class="kanji auth-brand-kanji">居合</div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="anim-fadeup" style="width:100%;max-width:340px">
+      <div class="label" style="color:var(--gold-soft)">入場 · ENTER THE DOJO</div>
+      <h1 class="brush-title auth-title">Welcome, warrior</h1>
+      <label class="field" style="margin-bottom:14px">
+        <span class="label">Username / 名</span>
+        <input class="input" id="inp-login-user" type="text" placeholder="ksatria_senja" maxlength="20" autocomplete="username">
+      </label>
+      <label class="field" style="margin-bottom:18px">
+        <span class="label">Password / 鍵</span>
+        <input class="input" id="inp-login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </label>
+      <button class="btn btn-primary btn-block" id="btn-login">抜刀 · Enter Arena</button>
+      <div class="rule" style="margin:20px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.2em">◆</div>
+      <button class="btn btn-ghost btn-block" id="btn-goto-register">新規 · Create new account</button>
+      <div id="ws-status" class="ws-status"><span class="dot dot-idle"></span> Connecting...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: REGISTER ══════════════════════════════════════════════ -->
+<div id="screen-register" class="screen stage grain auth-shell">
+  <div class="auth-brand">
+    <div class="auth-brand-glow"></div>
+    <div class="petal-field" id="reg-petals"></div>
+    <div class="auth-hero" id="reg-hero"></div>
+    <div class="auth-brand-logo">
+      <div class="brush-title hero-ink" style="font-size:40px">刃影</div>
+      <div class="label" style="margin-top:4px">BLADE & SHADOW</div>
+    </div>
+    <div class="kanji auth-brand-kanji">挑戦</div>
+  </div>
+  <div class="auth-form-panel">
+    <div class="anim-fadeup" style="width:100%;max-width:340px">
+      <div class="label" style="color:var(--gold-soft)">新規 · NEW CHALLENGER</div>
+      <h1 class="brush-title auth-title">Forge your name</h1>
+      <label class="field" style="margin-bottom:14px">
+        <span class="label">Username / 名</span>
+        <input class="input" id="inp-reg-user" type="text" placeholder="ksatria_senja" maxlength="20">
+      </label>
+      <label class="field" style="margin-bottom:14px">
+        <span class="label">Password / 鍵</span>
+        <input class="input" id="inp-reg-pass" type="password" placeholder="min. 6 characters">
+      </label>
+      <label class="field" style="margin-bottom:18px">
+        <span class="label">Confirm Password / 確</span>
+        <input class="input" id="inp-reg-pass2" type="password" placeholder="••••••••">
+      </label>
+      <button class="btn btn-primary btn-block" id="btn-register">結 · Forge your oath</button>
+      <div class="rule" style="margin:20px 0;font-family:var(--font-mono);font-size:11px;letter-spacing:.2em">◆</div>
+      <button class="btn btn-ghost btn-block" id="btn-goto-login">← Back to gate</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: LOBI (Room list | Create | Chat) ══════════════════════ -->
+<div id="screen-menu" class="screen stage grain lobby-shell">
+  <div class="lobby-header">
+    <div class="lobby-brand"><span class="kanji">刃影</span> <span class="label">DOJO</span></div>
+    <div class="lobby-user mono" id="menu-username-label"></div>
+    <a href="analytics.php" class="btn btn-ghost" style="padding:7px 14px;font-size:10px;text-decoration:none" target="_blank">統計 · Analytics</a>
+    <button class="btn btn-ghost" style="padding:7px 14px;font-size:10px" id="btn-logout">退 · Logout</button>
+  </div>
+  <div class="lobby-grid">
+    <!-- LEFT: Room List -->
+    <div class="lobby-col panel ticks">
+      <div class="lobby-col-head">
+        <span class="label">大広間 · ROOM LIST</span>
+        <span class="badge-count" id="room-count-badge">0</span>
+      </div>
+      <div class="scroll lobby-room-list" id="room-list-container">
+        <p class="empty-state">No rooms yet. Create the first one!</p>
+      </div>
+    </div>
+    <!-- CENTER: Create Room -->
+    <div class="lobby-col panel ticks">
+      <div class="lobby-col-head"><span class="label">作成 · CREATE ROOM</span></div>
+      <div class="lobby-create scroll">
+        <label class="field"><span class="label">Rounds</span>
+          <select class="input" id="sel-rounds">
+            <option value="3">3 Rounds</option>
+            <option value="5" selected>5 Rounds</option>
+            <option value="7">7 Rounds</option>
+            <option value="10">10 Rounds</option>
+          </select>
+        </label>
+        <label class="field"><span class="label">Max Players</span>
+          <select class="input" id="sel-max-players">
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4" selected>4 Players</option>
+            <option value="5">5 Players</option>
+          </select>
+        </label>
+        <label class="field"><span class="label">PIN (optional · 4–6 digits)</span>
+          <input class="input" id="inp-create-pin" type="text" placeholder="leave empty for no PIN" maxlength="6" inputmode="numeric">
+        </label>
+        <button class="btn btn-primary btn-block" id="btn-create-room" style="margin-top:4px">＋ Open Room</button>
+        <div class="rule" style="margin:16px 0">◆</div>
+        <div class="label" style="margin-bottom:10px">鍵 · JOIN BY CODE</div>
+        <label class="field"><input class="input" id="inp-room-code" type="text" placeholder="CODE (6 letters)" maxlength="6" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-weight:700"></label>
+        <button class="btn btn-ghost btn-block" id="btn-join-code" style="margin-top:8px">Join</button>
+      </div>
+    </div>
+    <!-- KANAN: Chat Global -->
+    <div class="lobby-col panel ticks">
+      <div class="lobby-col-head"><span class="label">伝言 · CHAT</span></div>
+      <div class="scroll lobby-chat" id="chat-messages"></div>
+      <div class="lobby-chat-input">
+        <input class="input" id="inp-chat" type="text" placeholder="Type a message..." maxlength="100">
+        <button class="btn btn-primary" id="btn-chat-send" style="padding:10px 14px">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: PIN ════════════════════════════════════════════════════ -->
+<div id="modal-pin" class="modal-overlay" style="display:none">
+  <div class="panel ticks modal-box">
+    <div class="kanji" style="font-size:42px;color:var(--gold);text-align:center">鍵</div>
+    <p class="brush-title" style="text-align:center;font-size:20px;margin:6px 0 16px">Room Locked</p>
+    <label class="field" style="margin-bottom:16px">
+      <span class="label">Enter PIN</span>
+      <input class="input" id="inp-pin-modal" type="text" placeholder="••••" maxlength="6" inputmode="numeric" style="text-align:center;letter-spacing:8px;font-size:22px">
+    </label>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-ghost btn-block" id="btn-pin-cancel">Cancel</button>
+      <button class="btn btn-primary btn-block" id="btn-pin-confirm">Join</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: ROOM (Ruang Tunggu + pilih karakter) ══════════════════ -->
+<div id="screen-room" class="screen stage grain">
+  <div class="room-wrap">
+    <div class="room-header">
+      <div>
+        <div class="label">居合 · WAITING ROOM</div>
+        <div class="room-code-line">CODE: <span class="gold-text" id="room-code-display">------</span>
+          <button class="btn btn-ghost" id="btn-copy-code" style="padding:4px 10px;font-size:10px;margin-left:8px">Copy</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost" id="btn-leave-room" style="padding:8px 16px">← Leave</button>
+    </div>
+
+    <div class="room-body">
+      <!-- Character selection -->
+      <div class="char-select">
+        <div class="label" style="margin-bottom:10px">選 · CHOOSE WARRIOR</div>
+        <div class="char-roster" id="char-roster"></div>
+        <div class="char-preview panel" id="char-preview"></div>
+      </div>
+
+      <!-- Player list in room -->
+      <div class="room-players panel ticks">
+        <div class="lobby-col-head"><span class="label">武者 · PLAYERS (<span id="room-count">0</span>/<span id="room-max">4</span>)</span></div>
+        <ul class="player-list scroll" id="room-player-list"></ul>
+        <div class="room-meta label" id="rounds-label">ROUNDS: 5</div>
+        <div id="host-controls">
+          <div id="bot-controls" style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-ghost btn-block" id="btn-add-bot" style="font-size:8px">+ ADD BOT</button>
+            <button class="btn btn-ghost btn-block" id="btn-remove-bot" style="font-size:8px" disabled>− REMOVE BOT</button>
+          </div>
+          <button class="btn btn-primary btn-block" id="btn-start-game" disabled style="margin-top:10px">⚔ START DUEL</button>
+          <p class="hint">Minimum 2 players (human/bot) · max 5</p>
+        </div>
+        <div id="guest-waiting" style="display:none">
+          <p class="hint" style="text-align:center;margin-top:14px">⏳ Waiting for host to start...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN: GAME (Duel Arena) ═════════════════════════════════════ -->
+<div id="screen-game" class="screen stage grain duel-stage">
+  <header class="duel-hud">
+    <span class="mono" id="game-room-label" style="color:var(--paper-3)">ROOM: ------</span>
+    <div class="duel-rounds" id="duel-round-pips"></div>
+    <span class="label" id="game-round-label">ROUND 0/5</span>
+  </header>
+  <div class="duel-arena" id="duel-arena"></div>
+  <div class="duel-center" id="duel-center"></div>
+  <button id="btn-click" class="duel-tap-zone" disabled></button>
+  <div class="duel-reveal" id="duel-reveal" style="display:none"></div>
+</div>
+
+<!-- ═══ SCREEN: STATS ═════════════════════════════════════════════════ -->
+<div id="screen-stats" class="screen stage grain">
+  <div class="petal-field" id="stats-petals"></div>
+  <div class="victory-screen">
+
+    <!-- Header kemenangan -->
+    <div class="victory-header">
+      <div class="kanji victory-kanji" id="winner-kanji">勝</div>
+      <div>
+        <div class="label" id="victory-sub">THE CHAMPION</div>
+        <h2 class="brush-title victory-name">🏆 <span id="winner-name">---</span></h2>
+      </div>
+    </div>
+
+    <!-- Podium karakter -->
+    <div class="victory-podium" id="victory-podium"></div>
+
+    <!-- Bawah: rincian + grafik berdampingan -->
+    <div class="victory-bottom">
+      <div class="victory-ranks panel ticks">
+        <div class="lobby-col-head"><span class="label">順位 · PERINGKAT</span></div>
+        <div class="scroll" id="all-player-stats"></div>
+      </div>
+      <div class="victory-chart panel">
+        <div class="label" style="margin-bottom:8px">推移 · REACTION TIME PER ROUND</div>
+        <div class="chart-box"><canvas id="rt-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tombol -->
+    <div class="victory-actions">
+      <button class="btn btn-ghost" id="btn-play-again">↻ Play Again</button>
+      <button class="btn btn-primary" id="btn-back-menu">← Back to Lobby</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/game-canvas.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

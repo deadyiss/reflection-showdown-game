@@ -1,0 +1,42 @@
+刃影 REFLEX SHOWDOWN — FINAL SUBMISSION BUNDLE
+Kelompok 2 / Kelas 4D — Cloud Computing — UNISKA 2026
+==================================================================
+
+ISI BUNDEL INI:
+
+1. reflexshowdown/            → Source code lengkap game (siap dijalankan)
+   - public/                  → Frontend (HTML/CSS/JS) + analytics.php
+   - src/                     → Server PHP (GameServer, Room, DB)
+   - server.php, config.php   → Entry point & konfigurasi
+   - database/schema.sql      → Skema database
+   - preview.html             → Preview tampilan tanpa server
+   - README.md                → Dokumentasi lengkap + cara menjalankan
+   - docs/screenshots/        → Tangkapan layar sistem
+
+2. preview.html               → (salinan) Buka langsung di browser untuk
+                                 melihat seluruh tampilan & animasi game
+                                 TANPA perlu menjalankan server/database.
+
+3. README.md                  → (salinan) Dokumentasi utama proyek.
+
+4. Proposal_Kelompok2.pdf     → Proposal awal.
+
+5. Laporan_Akhir_ReflexShowdown.docx  → Laporan akhir (dapat diedit).
+6. Laporan_Akhir_ReflexShowdown.pdf   → Laporan akhir (versi PDF).
+
+==================================================================
+CARA CEPAT MELIHAT GAME:
+  Buka "preview.html" di browser (klik dua kali). Gunakan tombol di
+  bagian atas untuk berpindah antar layar, atau tekan "Auto Tour".
+
+CARA MENJALANKAN GAME PENUH:
+  Lihat bagian "How to Run the System" di README.md.
+  Ringkas: composer install → import database/schema.sql →
+           php server.php → (terminal lain) php -S localhost:3000 di folder public.
+
+CATATAN:
+  - Antarmuka game & preview menggunakan Bahasa Inggris.
+  - Laporan akhir menggunakan Bahasa Indonesia (format akademik).
+  - Tautan di README & laporan masih placeholder — ganti dengan tautan asli.
+  - Placeholder gambar pada laporan: ganti dengan tangkapan layar / diagram asli.
+==================================================================
