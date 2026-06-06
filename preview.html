@@ -1,8 +1,4 @@
-<!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>刃影 Reflex Showdown — PREVIEW (no server)</title>
-<style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>刃影 Reflex Showdown — PREVIEW</title><style>
 /* ============================================================
    theme.css — RETRO PIXEL THEME · 刃影 Blade & Shadow
    Font pixel (Press Start 2P), palet crimson+gold, gelap.
@@ -30,7 +26,8 @@ body{
   font-family:var(--font-dot);
   font-size:15px;
   image-rendering:pixelated;
-  overflow:hidden;
+  overflow-x:hidden;
+  overflow-y:auto;
 }
 
 /* Scanline overlay global */
@@ -41,7 +38,7 @@ body::after{
 }
 
 /* ── Panggung dasar ───────────────────────────────────────── */
-.stage{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--ink-900)}
+.stage{position:relative;width:100%;min-height:100vh;overflow:visible;background:var(--ink-900)}
 .grain{background-image:
   repeating-linear-gradient(0deg,#0e0b16 0px,#0e0b16 7px,#100c1a 7px,#100c1a 8px);}
 
@@ -159,10 +156,11 @@ body::after{
 
 .screen{display:none}
 .screen.active{display:block}
-#screen-loading.active,#screen-room.active,#screen-stats.active{display:grid;place-items:center}
-#screen-login.active,#screen-register.active{display:grid}
-#screen-menu.active{display:flex;flex-direction:column}
-#screen-game.active{display:flex;flex-direction:column}
+#screen-loading.active{display:grid;place-items:center}
+#screen-room.active{display:grid;justify-items:center;align-items:start;padding:20px 0}
+#screen-login.active,#screen-register.active{display:grid;min-height:100vh}
+#screen-menu.active{display:flex;flex-direction:column;min-height:100vh}
+#screen-game.active{display:flex;flex-direction:column;min-height:100vh}
 
 /* ── Petal (kelopak kotak pixel) ─────────────────────────── */
 .petal-field{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
@@ -297,8 +295,8 @@ body::after{
 
 /* ── Stats ───────────────────────────────────────────────── */
 /* ── VICTORY SCREEN (full layout, tanpa scroll) ────────────── */
-#screen-stats.active{display:flex;align-items:stretch;justify-content:center}
-.victory-screen{width:100%;max-width:1100px;height:100vh;padding:18px 22px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2}
+#screen-stats.active{display:flex;align-items:flex-start;justify-content:center;padding:0}
+.victory-screen{width:100%;max-width:1100px;min-height:100vh;padding:18px 22px 28px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:2}
 .victory-header{display:flex;align-items:center;gap:18px;justify-content:center;flex-shrink:0}
 .victory-kanji{font-size:60px;line-height:1;text-shadow:3px 3px 0 #000}
 .victory-name{font-family:var(--font-px);font-size:18px;margin-top:6px}
@@ -321,7 +319,7 @@ body::after{
 .podium-pts span{font-size:8px;color:var(--paper-3)}
 
 /* Bawah: ranks + chart berdampingan */
-.victory-bottom{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;height:32vh;flex-shrink:0}
+.victory-bottom{display:grid;grid-template-columns:1fr 1.1fr;gap:14px;min-height:240px;flex-shrink:0}
 .victory-ranks{display:flex;flex-direction:column;overflow:hidden}
 .victory-ranks .scroll{flex:1;padding:8px;display:flex;flex-direction:column;gap:7px}
 .rank-row{display:flex;align-items:center;gap:10px;background:var(--ink-700);box-shadow:inset 0 0 0 2px var(--hairline);padding:7px 10px}
@@ -365,21 +363,16 @@ body::after{
 #preview-bar button:hover{box-shadow:inset 0 0 0 2px var(--gold)}
 #preview-bar button.active{background:var(--crimson-deep);box-shadow:inset 0 0 0 2px var(--crimson)}
 #preview-bar .pv-note{color:var(--paper-3);margin-left:auto}
-.screen{top:38px!important}
-.stage{height:calc(100vh - 38px)!important;margin-top:38px}
+/* ── PREVIEW: kompensasi tinggi toolbar 38px agar konten tidak meluap ── */
+body{padding-top:38px}
+.stage{min-height:calc(100vh - 38px)!important}
+#screen-login.active,#screen-register.active,
+#screen-menu.active,#screen-game.active,
+#screen-stats.active{min-height:calc(100vh - 38px)!important}
+.victory-screen{min-height:calc(100vh - 38px)!important}
+.duel-stage{height:calc(100vh - 38px)!important}
 </style></head><body>
-<div id="preview-bar">
-  <span class="pv-title">刃影 PREVIEW</span>
-  <button data-s="loading">Loading</button>
-  <button data-s="login">Login</button>
-  <button data-s="register">Register</button>
-  <button data-s="menu">Lobby</button>
-  <button data-s="room">Waiting Room</button>
-  <button data-s="game">Duel</button>
-  <button data-s="stats">Victory</button>
-  <button id="pv-auto">▶ Auto Tour</button>
-  <span class="pv-note">Preview mode — no server/database. Real visuals & animations.</span>
-</div>
+<div id="preview-bar"><span class="pv-title">刃影 PREVIEW</span><button data-s="loading">Loading</button><button data-s="login">Login</button><button data-s="register">Register</button><button data-s="menu">Lobby</button><button data-s="room">Waiting Room</button><button data-s="game">Duel</button><button data-s="stats">Victory</button><button id="pv-auto">▶ Auto Tour</button><span class="pv-note">Preview mode — no server/database. Real visuals & animations.</span></div>
 
 
 <!-- ═══ SCREEN: LOADING ═══════════════════════════════════════════════ -->
