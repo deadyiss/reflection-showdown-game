@@ -28,10 +28,10 @@ Link : https://deadyiss.github.io/reflection-showdown-game/
 
 | Dokumen | Tautan |
 |---------|--------|
-| Video Demo | https://example.com/demo-video _(placeholder — ganti nanti)_ |
-| Proposal (PDF) | docs\pdf\Proposal_ReflexShowdown_Kelompok2.pdf |
-| Laporan Akhir (PDF) | docs\pdf\Laporan_Akhir_ReflexShowdown_Kelompok2.pdf |
-| Slide Presentasi (PDF) | https://example.com/slides _(placeholder — ganti nanti)_ |
+| Video Demo | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/video_demo.mp4 |
+| Proposal (PDF) | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/Proposal_ReflexShowdown_Kelompok2.pdf |
+| Laporan Akhir (PDF) | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/Laporan_Akhir_ReflexShowdown_Kelompok2.pdf |
+| Slide Presentasi (PDF) | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/Slide_Presentasi_Reflexshowdown.pdf |
 
 ---
 
@@ -127,18 +127,19 @@ Halaman `analytics.php` membaca data **langsung dari basis data** (tabel `round_
 ### Pertanyaan yang Dijawab (sesuai hipotesis proposal)
 
 **H1 — Apakah performa pemain meningkat setelah beberapa kali bermain?**
-Dashboard membandingkan rata-rata RT pada ronde awal (1–2) dengan ronde akhir (4–5) di seluruh sesi. Jika RT akhir lebih rendah, performa meningkat. Prediksi proposal: RT ronde 4–5 lebih rendah 10–20% dari ronde 1–2. Hasilnya ditampilkan dengan grafik tren dan penilaian otomatis **TERBUKTI / TIDAK TERBUKTI**.
+Ya, terbukti. Rata-rata RT ronde 1–2 adalah 805ms, ronde 4–5 adalah 768ms. Terjadi penurunan 4,5% — artinya pemain rata-rata bereaksi lebih cepat di ronde akhir dibanding ronde awal. Penurunannya di bawah prediksi proposal (10–20%), tapi arahnya benar.
 
 **H2 — Apakah terdapat pemain yang lebih konsisten dibanding pemain lain?**
-Dashboard menghitung Standar Deviasi RT tiap pemain (makin kecil = makin konsisten) dan korelasi Pearson antara SD dan win rate. Prediksi proposal: korelasi negatif (SD rendah → win rate tinggi). Ditampilkan sebagai scatter plot beserta koefisien korelasi, dengan penilaian otomatis.
+Dari tabel per-pemain, jelas ada perbedaan konsistensi antar pemain. Contoh: nad punya SD 88ms (sangat konsisten), maulidahasanah SD 175ms, sementara hayati SD 825ms (sangat tidak konsisten). Jadi jawaban pertanyaannya: ya, ada pemain yang jauh lebih konsisten dari yang lain.
+
+Namun hipotesis H2 di proposal berbunyi lebih spesifik: pemain konsisten lebih sering menang. Ini yang tidak terbukti dari data. Korelasi Pearson antara SD dan win rate = −0,09, artinya hubungannya nyaris tidak ada (|r| < 0,3). Lihat scatter plot: titik-titik tersebar acak, tidak ada pola jelas bahwa SD kecil berarti win rate tinggi. Bahkan nad yang SD-nya paling kecil (88ms) punya win rate 0%.
 
 **Apakah hipotesis pada proposal terbukti?**
-Halaman menampilkan kesimpulan akhir berdasarkan data nyata yang terkumpul: status H1 dan H2 (terbukti atau tidak), beserta angka pendukung (persentase peningkatan, koefisien korelasi). Karena penilaian dihitung secara real-time dari isi basis data, kesimpulan akan menyesuaikan seiring bertambahnya data permainan.
+H1 terbukti (performa meningkat), H2 tidak terbukti (konsistensi tidak berkorelasi signifikan dengan kemenangan) berdasarkan 288 data klik dari 38 sesi. Untuk H2, kemungkinan sampel masih terlalu kecil dan tidak merata — beberapa pemain hanya main 1–2 sesi sehingga win rate-nya ekstrem (0% atau 100%) dan mendistorsi korelasi.
 
 ### Kesimpulan Didukung Data
 Setiap klaim pada dashboard disertai angka yang dihitung dari tabel basis data: jumlah sesi, jumlah data klik, rata-rata RT per ronde, SD per pemain, dan win rate. Tidak ada nilai yang di-_hardcode_ — halaman kosong sebelum ada permainan dan terisi otomatis setelah beberapa sesi.
 
-> **Catatan:** untuk hasil yang bermakna, kumpulkan data dengan memainkan beberapa sesi (idealnya beberapa pemain manusia, masing-masing beberapa sesi 5 ronde). Dengan sedikit data, hipotesis mungkin tampil "tidak terbukti" hanya karena sampel kecil.
 
 ---
 
