@@ -28,7 +28,7 @@ Link : https://deadyiss.github.io/reflection-showdown-game/
 
 | Dokumen | Tautan |
 |---------|--------|
-| Video Demo | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/video_demo.mp4 |
+| Video Demo | https://drive.google.com/file/d/1s_ZlRKJUVLDxeieWQdh_o5cLwkYxgLyN/view?usp=sharing |
 | Proposal (PDF) | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/Proposal_ReflexShowdown_Kelompok2.pdf |
 | Laporan Akhir (PDF) | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/Laporan_Akhir_ReflexShowdown_Kelompok2.pdf |
 | Slide Presentasi (PDF) | https://github.com/deadyiss/reflection-showdown-game/blob/main/docs/pdf/Slide_Presentasi_Reflexshowdown.pdf |
